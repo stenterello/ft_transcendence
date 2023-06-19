@@ -1,6 +1,6 @@
 # ft_transcendence
 
-This repository houses our ongoing collaboration on the ft_transcendence project, the final project of the Common Core curriculum at 42School. Join us on this exciting journey as we create a captivating web application.
+This repository houses our ongoing collaboration on the ft_transcendence project, the final project of the Common Core curriculum at 42School.
 
 ## Description
 
