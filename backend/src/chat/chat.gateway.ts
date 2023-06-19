@@ -1,0 +1,467 @@
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayInit,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  MessageBody } from '@nestjs/websockets';
+import { Socket, Server } from 'socket.io';
+import { BadRequestException, ForbiddenException } from '@nestjs/common'
+import { PrismaService } from 'prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
+import { Rooms, User, Events } from "@prisma/client";
+import { ChatRepository } from './chat.repository';
+
+@WebSocketGateway({ cors: true, pingTimeout: 30000 })
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  constructor (
+    private prisma: PrismaService,
+    private userService: UserService,
+    private chatRepository: ChatRepository
+    ) {}
+    
+    @WebSocketServer()
+    server: Server;
+    
+    users: string[] = [];
+
+  afterInit(server: any) {
+    console.log('WebSocket listening...')
+  }
+
+  public async handleConnection(client: any, ...args: any[]) {
+    const username = client.handshake.headers['username'];
+    const sockId = client.id;
+    const user: User | null = await this.prisma.user.findUnique({
+      where: { username: username }
+    })
+    if (!user) {
+      return "can't connect user, is not registered";
+    }
+    if (this.users.indexOf(username) !== -1) {
+      return this.server.to(sockId).emit("forbidden");
+    }
+    await this.prisma.user.update({
+      where: { username: username },
+      data : { socketId: sockId, status: 'online' }
+    })
+    console.log('User connected: ' + client.id);
+    this.users.push(username);
+    console.log(...this.users)
+    await this.server.in(client.id).socketsJoin('general');
+    return this.server.emit("status", { username: username, status: "online" });
+  }
+
+  public async handleDisconnect(client: Socket) {
+    const sockId = client.id;
+    const user = await this.userService.findBySocket(sockId);
+    if (user) {
+      await this.prisma.user.update({
+        where: {
+          socketId: sockId,
+        },
+          data : {
+            socketId: null,
+            status: 'offline',
+        }
+      })
+      const index = this.users.indexOf(user.username);
+      this.users.splice(index, 1);
+      console.log('User disconnected: ', client.id);
+      this.server.emit("status", { username: user.username, status: "offline" });
+    }
+  }
+
+  @SubscribeMessage('general')
+  async generalMessage(client: Socket, data: string) {
+    const user = await this.userService.findBySocket(client.id);
+    if (user) {
+      await this.prisma.chat.create({
+        data: {
+          author: user.username,
+          room: "general",
+          message: data
+        }
+      })
+      await this.server.emit('general', user.username + ": " + data);
+    }
+  }
+
+  @SubscribeMessage('friendRequest')
+  async getFriendRequest(client: Socket, data: string) {
+    const friend = await this.userService.findByName(data);
+    const user = await this.userService.findBySocket(client.id);
+    console.log('friend request ' + client.id, data);
+    if (user) {
+      const check: string[] = await friend.friendsReq;
+      const index = check.indexOf(user.username);
+      if (index !== -1) {
+        return ("friend request already sent!");
+      }
+      let data = await this.prisma.user.update({
+        where: { username: friend.username },
+        data: {
+          events: {
+            create: { type: "FRIEND", sender: user.username}
+          }
+        },
+        select: { events: true}
+      })
+      if (friend.status != "offline") {
+        await this.server.to(friend.socketId).emit("event", {
+          data
+        });
+      }
+    }
+  }
+
+  @SubscribeMessage('clearNotification')
+  async clearNoti(client: Socket, data: any) {
+    const user: User | null = await this.userService.findBySocket(client.id);
+    if (user) {
+      await this.prisma.events.delete({
+        where: { id: data },
+      })
+    }
+  }
+
+  @SubscribeMessage('getFriendReq')
+  async sendFriendReq(client: Socket) {
+    const username = await this.userService.findBySocket(client.id);
+    if (username) {
+      const arr = await this.chatRepository.getFriendReq(username.username);
+      if (arr && arr.length > 0) {
+        console.log(arr);
+        return arr;
+      }
+    }
+    return null;
+  }
+
+  @SubscribeMessage('friendRes')
+  async answerFriendRequest(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const friend: User | null = await this.userService.findByName(json['user']);
+    if (user && friend) {
+      const arr = user['friendsReq'];
+      if (arr.length > 0) {
+        const index = arr.indexOf(friend.username);
+        if (index !== -1) {
+          arr.splice(index, 1);
+          await this.prisma.user.update({
+            where: { username: user.username },
+            data: {
+              friendsReq: arr,
+            }
+          })
+        }
+      }
+      if (json['bool'] === false) {
+        return ("user didn't accept your request :(")
+      }
+      if (user && friend && json['bool'] == true) {
+        return await this.chatRepository.addFriend(user.username, friend.username);
+      }
+    }
+    throw new BadRequestException("coudln't find user or friend");
+  }
+
+  @SubscribeMessage('delFriend')
+  async delFriend(client: Socket, data: string) {
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const friend: User | null = await this.userService.findByName(data);
+    if (user && friend) {
+      return await this.chatRepository.delFriend(user.username, friend.username);
+    }
+  }
+
+  @SubscribeMessage('status')
+  async updateStatus(client: Socket, newStatus: string) {
+    const user = await this.userService.findBySocket(client.id);
+    if (user) {
+      await this.prisma.user.update({
+        where: {
+          socketId: client.id,
+        },
+        data: {
+          status: newStatus,
+        }
+      })
+      return ({username: user.username, status: newStatus});
+    }
+  }
+
+  @SubscribeMessage("private message")
+  async sendPrivateMsg(client: Socket, data: any)  {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    let to = json['user'];
+    if (user!.username == to) {
+      return ("Don't be silly, you can't send a message to yourself!");
+    }
+    let msg = json['message'];
+    if (to && msg) {
+      const user = await this.userService.findByName(to);
+      const sender = await this.userService.findBySocket(client.id);
+      if (user && sender) {
+        let arr = await this.prisma.user.findUnique({
+          where: { username: user.username },
+          select: { privateConv: true }
+        })
+        if (arr && arr.privateConv && (arr.privateConv.indexOf(sender.username) === -1)) {
+          if (user.privateConv.indexOf(sender.username) === -1) {
+            await this.prisma.user.update({
+              where: { username: user.username },
+              data: { privateConv: { push: sender.username,}
+              }
+            })
+          }
+          if (sender.privateConv.indexOf(user.username) === -1) {
+            await this.prisma.user.update({
+              where: { username: sender.username },
+              data: { privateConv: { push: user.username,}}
+            })
+          }
+        }
+        await this.prisma.chat.create({
+          data: {
+            author: sender.username,
+            room: user.username,
+            message: msg
+          }
+        })
+        const events = await this.prisma.user.findUnique({ where: {username: user.username}, select: {events: true}});
+        if (events) {
+          let bool = false;
+          const arr = events.events;
+          for (let i = 0; i < arr.length; i++) {
+            if (arr[i].type === "MESSAGE" && arr[i].sender === sender.username) {
+              bool = true;
+              break
+            }
+          }
+          if (bool === false) {
+            await this.prisma.user.update({
+              where: { username: user.username },
+              data: {
+                events: {
+                  create: {type: "MESSAGE", sender: sender.username }
+                }
+              }
+            })
+          }
+        }
+        this.server.to(client.id).emit("private message", {
+          msg,
+            from: sender.username,
+        })
+        if (user.status != 'offline') {
+          this.server.to(user.socketId).emit("private message", {
+            msg,
+            from: sender.username,
+          })
+        } 
+      }
+    }
+  }
+
+
+  @SubscribeMessage("DeleteConv")
+  async delConv(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const toDel: User | null = await this.userService.findByName(json['user']);
+    if (user && toDel) {
+      let arr = await this.prisma.user.findUnique({
+        where: { username: user.username },
+        select: { privateConv: true}
+      })
+      if (arr) {
+        const index = arr.privateConv.indexOf(toDel.username);
+        if (index !== -1) {
+          arr.privateConv.splice(index, 1);
+          return await this.prisma.user.update({
+            where: { username: user.username },
+            data: {
+              privateConv: arr.privateConv,
+            } 
+          })
+        }
+      }
+    }
+  }
+
+  @SubscribeMessage("joinRoom")
+  async joinRoom(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    if (user && room && room.password === json['password']) {
+      if (room.banlist.includes(user.username)) {
+        throw new ForbiddenException("User banned!");
+      }
+      await this.chatRepository.addMember(json['room'], user.username);
+      return await this.server.in(client.id).socketsJoin(room.name);
+    } else {
+      throw new BadRequestException("password doesn't match");
+    }
+  }
+
+  @SubscribeMessage("leaveRoom")
+  async leaveRoom(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    if (room && user && room.members.includes(user.username)) {
+      this.chatRepository.removeMember(room.name, user.username);
+      return await this.server.in(client.id).socketsLeave(room.name);
+    } else {
+      throw new BadRequestException("are you sure room exists and user is a member of it?");
+    }
+  }
+
+  @SubscribeMessage("deleteRoom")
+  async deleteRoom(client: Socket, data: string) {
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(data);
+    if (user && room && room.admins.includes(user.username)) {
+      const arr = await this.chatRepository.getRoomMembers(room.name);
+      if (arr) {
+        this.server.in(arr).socketsLeave(room.name);
+      }
+      return await this.prisma.rooms.delete({ where: { name: room.name }});
+    }
+    throw new ForbiddenException("you don't have permission to perform this action")
+  }
+
+  @SubscribeMessage("kickUser")
+  async kick(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const tokick: User | null = await this.userService.findByName(json['user']);
+    if (room && user && room.admins.includes(user.username) && tokick && tokick.socketId) {
+      await this.server.in(tokick.socketId).socketsLeave(room.name);
+      await this.chatRepository.removeMember(room.name, tokick.username);
+      return (tokick.username + " kicked");
+    }
+    throw new ForbiddenException("You need to be an admin to perform this action")
+  }
+
+  @SubscribeMessage("banUser")
+  async ban(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const toBan: User | null = await this.userService.findByName(json['user']);
+    if (room && user && room.admins.includes(user.username) && toBan) {
+      if (await this.chatRepository.ban(room.name, toBan.username) && toBan.socketId) {
+        return await this.server.in(toBan.socketId).socketsLeave(room.name);
+      }
+    }
+    throw new ForbiddenException("You need to be an admin to perform this action")
+  }
+
+  @SubscribeMessage("mute")
+  async mute(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const toMute: User | null = await this.userService.findByName(json['user']);
+    if (room && user && room.admins.includes(user.username) && toMute) {
+      return await this.chatRepository.mute(room.name, toMute.username);
+    }
+    throw new ForbiddenException("You need to be an admin to perform this action")
+  }
+
+  @SubscribeMessage("unmute")
+  async unmute(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const toMute: User | null = await this.userService.findByName(json['user']);
+    if (room && user && room.admins.includes(user.username) && toMute) {
+      return await this.chatRepository.unmute(room.name, toMute.username);
+    }
+    throw new ForbiddenException("You need to be an admin to perform this action")
+  }
+
+  @SubscribeMessage("unbanUser")
+  async unban(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    if (room && user && room.admins.includes(user.username)) {
+        this.chatRepository.unban(room.name, json['user']);
+        this.server.in(client.id).socketsLeave(room.name);
+        return "user banned";
+      }
+    }
+
+  @SubscribeMessage("promoteAdmin")
+  async addAdmin(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    if (room && user && room.admins.includes(user.username) && user.socketId) {
+      return await this.chatRepository.addAdmin(room.name, json['user']);
+    }
+    throw new BadRequestException("user not found or action not permitted");
+  }
+  
+  @SubscribeMessage("demoteAdmin")
+  async demoteAdmin(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    if (room && user && room.admins.includes(user.username)) {
+      return this.chatRepository.removeAdmin(room.name, json['user']); 
+    }
+    throw new ForbiddenException("You need to be admin to perform this action");
+  }
+
+  @SubscribeMessage("inviteRoom")
+  async inviteToRoom(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const target: User | null = await this.userService.findByName(json['user']);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    if (user && target && room && target.status != 'offile' && target.socketId) {
+      let newEvent = await this.prisma.user.update({
+        where: { username: target.username },
+        data: {
+          events: {
+            create: { type: "INVITEROOM", sender: user.username },
+          }
+        },
+        select: { events: true }
+      })
+      await this.server.to(target.socketId).emit("events", newEvent);
+      return await this.server.to(target.socketId).emit('invites', { room: json['room']});
+    }
+    throw new BadRequestException("users or room wrong");
+  }
+
+  @SubscribeMessage("sendToRoom")
+  async sendToRoom(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    if (room && user) {
+      const mutelist = room.mutelist;
+      if (mutelist.includes(user.username)) {
+        return ("user muted");
+      } else {
+        return await this.server.emit(json['room'], json['message']);
+      }
+    }
+  }
+
+  @SubscribeMessage('log')
+  async getUser() {
+    return this.users
+  }
+
+}

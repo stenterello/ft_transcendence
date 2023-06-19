@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["user", "chat", "rooms", "matches"]
+}
+
+
+model User {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  username      String    @unique
+  email         String    @unique
+  status        String    @default("offline")
+  score         Int       @default(0)
+  pictureLink   String?   @default("http://localhost:3000/uploads/default-avatar.png")
+  victories     Int       @default(0)
+  loses         Int       @default(0)
+  matches       Int       @default(0)
+  password      String?   @unique
+  cookie        String?   @unique
+  expires       DateTime?
+  twofaSecret   String?   @unique
+  istwofaEnable Boolean?  @default(false)
+  isOAuthLogged Boolean?  @default(false)
+  socketId      String?   @unique
+  events        Events[]
+  friends       String[]
+  friendsReq    String[]
+  blocklist     String[]
+  privateConv   String[]
+
+  @@schema("user")
+}
+
+model Events {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  type          Type?
+  sender        String
+  receiver      User      @relation(fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId    Int
+
+  @@schema("user")
+}
+
+enum Type {
+  FRIEND
+  MESSAGE
+  INVITEROOM
+
+  @@schema("user")
+}
+
+model Chat {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  author        String
+  room          String
+  message       String
+
+  @@schema("chat")
+}
+
+model Rooms {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  password      String?
+  admins        String[]
+  banlist       String[]
+  members       String[]
+  mutelist      String[]
+
+  @@schema("rooms")
+}
+
+model Matches {
+  id            Int       @id @default(autoincrement())
+  type          String    @default("official")
+  player1       String
+  player2       String
+  score         String
+
+  @@schema("matches")
+}
