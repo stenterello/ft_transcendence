@@ -8,7 +8,7 @@ The ft_transcendence project is a multiplayer online gaming platform inspired by
 
 ### Frontend
 
-The frontend of our web app is my main focus, and it is developed using the Svelte framework. It's responsible for providing a seamless user interface and an immersive gaming experience. We are dedicated to designing an intuitive and visually stunning frontend that aligns with our Kill Bill-themed aesthetic. Users will have the opportunity to choose avatars inspired by iconic characters from Quentin Tarantino's movies, and they will receive achievements based on the remarkable feats of the protagonist, "The Bride".
+The frontend of our web app is my main focus, and it is developed using the Svelte framework. It's responsible for providing a seamless user interface and an immersive gaming experience. We are dedicated to designing an intuitive frontend that aligns with our Kill Bill-themed aesthetic. Users will have the opportunity to choose avatars inspired by iconic characters from Quentin Tarantino's movies, and they will receive achievements based on the remarkable feats of the protagonist, "The Bride".
 
 ### Backend and Database
 
