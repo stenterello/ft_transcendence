@@ -330,6 +330,22 @@ let ChatGateway = class ChatGateway {
             }
         });
     }
+    changePwd(client, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const json = JSON.parse(data);
+            const user = yield this.userService.findBySocket(client.id);
+            const room = yield this.chatRepository.getRooms(json['room']);
+            const pwd = yield json['password'];
+            if (room.admins.includes(user.username)) {
+                return yield this.prisma.rooms.update({
+                    where: { name: room.name },
+                    data: {
+                        password: pwd,
+                    }
+                });
+            }
+        });
+    }
     deleteRoom(client, data) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield this.userService.findBySocket(client.id);
@@ -544,6 +560,12 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "leaveRoom", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)("changePwd"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "changePwd", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)("deleteRoom"),
     __metadata("design:type", Function),

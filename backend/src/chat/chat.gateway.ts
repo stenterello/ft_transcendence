@@ -322,6 +322,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
+  @SubscribeMessage("changePwd")
+  async changePwd(client: Socket, data: any) {
+    const json = JSON.parse(data);
+    const user: User | null = await this.userService.findBySocket(client.id)!;
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room'])!;
+    const pwd: string = await json['password'];
+
+    if (room!.admins.includes(user!.username)) {
+      return await this.prisma.rooms.update({
+        where: {name: room!.name},
+        data: {
+          password: pwd,
+        }
+      })
+    }
+  }
+
   @SubscribeMessage("deleteRoom")
   async deleteRoom(client: Socket, data: string) {
     const user: User | null = await this.userService.findBySocket(client.id);

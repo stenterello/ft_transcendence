@@ -28,6 +28,7 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     delConv(client: Socket, data: any): Promise<User | undefined>;
     joinRoom(client: Socket, data: any): Promise<void>;
     leaveRoom(client: Socket, data: any): Promise<void>;
+    changePwd(client: Socket, data: any): Promise<Rooms | undefined>;
     deleteRoom(client: Socket, data: string): Promise<Rooms>;
     kick(client: Socket, data: any): Promise<string>;
     ban(client: Socket, data: any): Promise<void>;
