@@ -25,6 +25,7 @@ exports.ChatController = void 0;
 const common_1 = require("@nestjs/common");
 const chat_service_1 = require("./chat.service");
 const chat_gateway_1 = require("./chat.gateway");
+const bcrypt_1 = require("../utils/bcrypt");
 let ChatController = class ChatController {
     constructor(chatService, chatGateway) {
         this.chatService = chatService;
@@ -57,10 +58,10 @@ let ChatController = class ChatController {
     }
     createRoom(room, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const pwd = data.get('password');
+            const pwd = (0, bcrypt_1.encodePassword)(data.get('password'));
             const user = data.get("user");
             let roomDto = { name: room, password: pwd !== null ? pwd : null, admins: [user], banlist: [], members: [user] };
-            console.log("create room");
+            console.log("create room " + room + ' ' + pwd);
             return yield this.chatService.createRoom(roomDto);
         });
     }

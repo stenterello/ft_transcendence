@@ -25,6 +25,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const user_service_1 = require("../user/user.service");
 const chat_repository_1 = require("./chat.repository");
+const bcrypt_1 = require("../utils/bcrypt");
 let ChatGateway = class ChatGateway {
     constructor(prisma, userService, chatRepository) {
         this.prisma = prisma;
@@ -99,19 +100,20 @@ let ChatGateway = class ChatGateway {
         return __awaiter(this, void 0, void 0, function* () {
             const friend = yield this.userService.findByName(data);
             const user = yield this.userService.findBySocket(client.id);
-            console.log('friend request ' + client.id, data);
             if (user) {
                 const check = yield friend.friendsReq;
                 const index = check.indexOf(user.username);
                 if (index !== -1) {
                     return ("friend request already sent!");
                 }
+                console.log('user ' + user.username + ' sent a friend request to ' + friend.username);
                 let data = yield this.prisma.user.update({
                     where: { username: friend.username },
                     data: {
                         events: {
                             create: { type: "FRIEND", sender: user.username }
-                        }
+                        },
+                        friendsReq: { push: user.username },
                     },
                     select: { events: true }
                 });
@@ -304,15 +306,18 @@ let ChatGateway = class ChatGateway {
             const json = JSON.parse(data);
             const user = yield this.userService.findBySocket(client.id);
             const room = yield this.chatRepository.getRooms(json['room']);
-            if (user && room && room.password === json['password']) {
+            if (user && room) {
                 if (room.banlist.includes(user.username)) {
                     throw new common_1.ForbiddenException("User banned!");
                 }
+                if (room.password !== null) {
+                    if (!(0, bcrypt_1.comparePassword)(json['password'], room.password)) {
+                        console.log("wrong password!");
+                        return;
+                    }
+                }
                 yield this.chatRepository.addMember(json['room'], user.username);
                 return yield this.server.in(client.id).socketsJoin(room.name);
-            }
-            else {
-                throw new common_1.BadRequestException("password doesn't match");
             }
         });
     }
@@ -340,7 +345,7 @@ let ChatGateway = class ChatGateway {
                 return yield this.prisma.rooms.update({
                     where: { name: room.name },
                     data: {
-                        password: pwd,
+                        password: (0, bcrypt_1.encodePassword)(pwd),
                     }
                 });
             }

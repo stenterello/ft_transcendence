@@ -12,6 +12,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { Rooms, User, Events } from "@prisma/client";
 import { ChatRepository } from './chat.repository';
+import { encodePassword, comparePassword } from 'src/utils/bcrypt';
 
 @WebSocketGateway({ cors: true, pingTimeout: 30000 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -92,19 +93,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async getFriendRequest(client: Socket, data: string) {
     const friend = await this.userService.findByName(data);
     const user = await this.userService.findBySocket(client.id);
-    console.log('friend request ' + client.id, data);
     if (user) {
       const check: string[] = await friend.friendsReq;
       const index = check.indexOf(user.username);
       if (index !== -1) {
         return ("friend request already sent!");
       }
+      console.log('user ' + user.username + ' sent a friend request to ' + friend.username);
       let data = await this.prisma.user.update({
         where: { username: friend.username },
         data: {
           events: {
             create: { type: "FRIEND", sender: user.username}
-          }
+          },
+          friendsReq: { push: user.username },
         },
         select: { events: true}
       })
@@ -296,16 +298,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("joinRoom")
   async joinRoom(client: Socket, data: any) {
     const json = JSON.parse(data);
-    const user = await this.userService.findBySocket(client.id);
+    const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
-    if (user && room && room.password === json['password']) {
+    if (user && room) {
       if (room.banlist.includes(user.username)) {
         throw new ForbiddenException("User banned!");
       }
+      if (room.password !== null) {
+        if (!comparePassword(json['password'], room.password)) {
+          console.log("wrong password!");
+          return ;
+        }
+      }
       await this.chatRepository.addMember(json['room'], user.username);
       return await this.server.in(client.id).socketsJoin(room.name);
-    } else {
-      throw new BadRequestException("password doesn't match");
     }
   }
 
@@ -333,7 +339,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return await this.prisma.rooms.update({
         where: {name: room!.name},
         data: {
-          password: pwd,
+          password: encodePassword(pwd),
         }
       })
     }
