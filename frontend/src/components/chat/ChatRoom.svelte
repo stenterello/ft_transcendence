@@ -8,6 +8,7 @@
         const   res: Response = await fetch('http://localhost:3000/chat/' + chat);
         const   json: Object = await res.json();
 
+        return json;
     }
 
     async function  getRoomObject(): Promise<Object> {
@@ -19,8 +20,6 @@
         }
     }
 
-    getMessages();
-
 </script>
 
 {#await getRoomObject()}
@@ -29,11 +28,22 @@
     <section id="chat-space">
         {#if chat !== null}
             {#key $statusChange}
-                <OnlineUsers users={roomInfo['members']} --height="40%" />
+                <OnlineUsers users={roomInfo['members']} --height="25%" />
             {/key}
-            <ul>
+            {#await getMessages()}
+                <p>loading</p>
+            {:then messages}
+                <div id="messages">
+                    <h4>{roomInfo['name']}</h4>
+                    {#if messages.length > 0}
+                        <ul>
 
-            </ul>
+                        </ul>
+                    {:else}
+                        <p>still no messages</p>
+                    {/if}
+                </div>
+            {/await}
         {/if}
     </section>
 {/await}
@@ -48,4 +58,22 @@
         width: 100%;
         z-index: 1;
 	}
+    #messages {
+        background-color: white;
+        border: 1px solid black;
+        height: 75%;
+    }
+    h4 {
+        margin: 0;
+        padding: 0;
+        font-family: 'TrashHand';
+        color: #fcd612;
+        background-color: black;
+        height: 10%;
+    }
+    ul {
+        margin: 0;
+        height: 90%;
+        padding: 0;
+    }
 </style>

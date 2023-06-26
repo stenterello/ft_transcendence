@@ -172,7 +172,7 @@
 {/if}
 
 {#key chat}
-	<ChatRoom {chat} {roomInfo} />
+	<ChatRoom {chat} />
 {/key}
 
 <style>
