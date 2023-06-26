@@ -316,6 +316,9 @@ let ChatGateway = class ChatGateway {
                         return;
                     }
                 }
+                console.log('ale');
+                console.log(json['room']);
+                console.log(user.username);
                 yield this.chatRepository.addMember(json['room'], user.username);
                 return yield this.server.in(client.id).socketsJoin(room.name);
             }
@@ -478,6 +481,9 @@ let ChatGateway = class ChatGateway {
             const json = JSON.parse(data);
             const user = yield this.userService.findBySocket(client.id);
             const room = yield this.chatRepository.getRooms(json['room']);
+            console.log('qui');
+            console.log(room);
+            console.log(user);
             if (room && user) {
                 const mutelist = room.mutelist;
                 if (mutelist.includes(user.username)) {

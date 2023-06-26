@@ -14,6 +14,7 @@ export let  blockedUsers: Writable<Array<string>> = writable([]);
 export let  waitingGame: Writable<boolean> = writable(false);
 export let	statusChange: Writable<boolean> = writable(true);
 export let	userSelected: Writable<string> = writable(undefined);
+export let	roomSelected: Writable<string> = writable(undefined);
 export let	newMessage: Writable<boolean> = writable(false);
 export let	opponent: Writable<string> = writable(undefined);
 export let	pos: Writable<string> = writable(undefined);

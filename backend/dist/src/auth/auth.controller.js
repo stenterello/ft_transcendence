@@ -71,6 +71,7 @@ let AuthController = class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             const name = body.get('username');
             const twofa = body.get('twoFactorAuthenticationCode');
+            console.log('entrato');
             if (name && twofa) {
                 const user = yield this.userService.findByName(name);
                 const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(twofa, user);

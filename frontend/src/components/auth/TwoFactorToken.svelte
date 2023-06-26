@@ -24,7 +24,7 @@
 		}
 		else
 		{
-			const	toSend = { 'username': $userInfo['username'], 'twoFactorAuthenticationCode': token };
+			const	toSend = { 'username': $userInfo['username'], 'email': $userInfo['email'], 'twoFactorAuthenticationCode': token };
 			const	response: Response = await fetch('http://localhost:3000/auth/2fa/authenticate', {
 				method: 'POST',
 				headers: {
@@ -59,3 +59,9 @@
 	<input id="token" type="password" required>
 	<button on:click|preventDefault={checkToken}>Submit</button>
 </div>
+
+<style>
+	p {
+		color: white;
+	}
+</style>

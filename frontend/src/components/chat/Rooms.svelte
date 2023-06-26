@@ -1,8 +1,7 @@
 <script lang="ts">
 
-	import { userInfo } from "../../data";
+	import { userInfo, socket, roomSelected } from "../../data";
 	import ChatRoom from "./ChatRoom.svelte";
-	import { socket } from "../../data";
 
 	let			roomOptions: boolean = false;
 	let     	toDelete: boolean = false;
@@ -13,8 +12,9 @@
 	let			chat: string | null = null;
 	let			roomInfo: Object | null = null;
 	let			roomChange: boolean = false;
+	let			room: string = undefined;
 
-	async function	getRooms(): Promise<Array<Object>> {
+	async function	getRooms(): Promise<void> {
 		const	res: Response = await fetch('http://localhost:3000/chat/rooms');
 		let		ret: Array<Object> = [];
 		if (res.ok)
@@ -26,6 +26,7 @@
 		}
 		otherRooms = [];
 		ownedRooms = [];
+		rooms = [];
 		if (Object.keys(ret).length === 0) {
 			return ;
 		}
@@ -35,6 +36,7 @@
 					ownedRooms.push(ret[i]);
 				else
 					otherRooms.push(ret[i]);
+				rooms.push(ret[i]);
 			}
 		}
 	}
@@ -45,19 +47,19 @@
 			const	input: HTMLInputElement = document.createElement('input');
 			input.type = 'text';
 			input.placeholder = 'set your password';
-			input.setAttribute('id', 'room-password');
+			input.setAttribute('id', 'room-password-create');
 			const	select: HTMLElement = document.getElementById('room-privacy');
 			select.after(input);
 		}
-		else if (document.getElementById('room-password') !== null)
-			document.getElementById('room-password').remove();
+		else if (document.getElementById('room-password-create') !== null)
+			document.getElementById('room-password-create').remove();
 	}
 
-	async function	createRoom() {
+	async function	createRoom(): Promise<void> {
 		const	roomName: string = document.getElementById('room-name').value;
 		let		password: string | null = null;
-		if (document.getElementById('room-password') !== null)
-			password = document.getElementById('room-password').value;
+		if (document.getElementById('room-password-create') !== null)
+			password = document.getElementById('room-password-create').value;
 		const	json: Object = { user: $userInfo['username'], password: password };
 
 		await fetch('http://localhost:3000/chat/create/' + roomName, {
@@ -71,8 +73,24 @@
 	}
 
 	async function	chooseRoom(event): Promise<void> {
-		chat = event.target.innerHTML;
-		roomInfo = rooms.find(elem => elem['name'] === chat);
+		roomInfo = rooms.find(elem => elem['name'] === event.target.innerHTML);
+		if (roomInfo['password'] !== null && room === undefined && roomInfo['members'].includes($userInfo['username']) === false)
+		{
+			room = event.target.innerHTML;
+			document.getElementById('insert-password').style.visibility = 'visible';
+			return ;
+		}
+		$roomSelected = event.target.innerHTML;
+		if (roomInfo['members'].includes($userInfo['username']) === false) {
+			$socket.emit('joinRoom', JSON.stringify({'room': $roomSelected}));
+		}
+	}
+
+	async function	tryPassword(room: string, password: string): Promise<void> {
+		$roomSelected = room;
+		if (roomInfo['members'].includes($userInfo['username'] === false)) {
+			$socket.emit('joinRoom', JSON.stringify({'room': $roomSelected, 'password': password}));
+		}
 	}
 
 	async function getOwningRooms(): Promise<Array<Object>> {
@@ -108,34 +126,44 @@
 	{#await getRooms()}
 		<p>loading rooms</p>
 	{:then} 
-		<div id="room-container">
-			<h3>rooms available</h3>
-			<h3>your rooms</h3>
-			{#if otherRooms.length === 0}
-				<p>No rooms</p>
-			{:else}
-				<ul>
-					{#each otherRooms as room}
-						<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button><span>{roomPrivacy(room)}</span></li>
-					{/each}
-				</ul>
-			{/if}
-			{#if ownedRooms.length === 0}
-				<p>No owned rooms</p>
-			{:else}
-				<ul>
-					{#each ownedRooms as room}
-						<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button></li>
-					{/each}
-				</ul>
-			{/if}
+		<div id="outer-container">
+			<div id="room-container">
+				<h3>rooms available</h3>
+				<h3>your rooms</h3>
+				{#if otherRooms.length === 0}
+					<p>No rooms</p>
+				{:else}
+					<ul>
+						{#each otherRooms as room}
+							<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button><span>{roomPrivacy(room)}</span></li>
+						{/each}
+					</ul>
+				{/if}
+				{#if ownedRooms.length === 0}
+					<p>No owned rooms</p>
+				{:else}
+					<ul>
+						{#each ownedRooms as room}
+							<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button></li>
+						{/each}
+					</ul>
+				{/if}
+				<form on:submit|preventDefault={() => tryPassword(room, document.getElementById('room-password').value)} id="insert-password">
+					<button on:click={() => { document.getElementById('insert-password').style.visibility = 'hidden'; }} style="position: absolute; background-color: black; width: 4%; height: 11%; border-radius: 1vw; top: 10px; right: 20px; padding: 0; background: url('cross.png') no-repeat; background-size: cover; background-color: white;"></button>
+					<p>This chat room is protected.</p>
+					<p>Insert password</p>
+					<input id="room-password" type="password" required>
+					<input type="submit">
+				</form>
 			</div>
+			<hr>
+
+			<button on:click={() => { roomOptions = (roomOptions === true) ? false : true}}>Create your room</button>
+
+		</div>
 	{/await}
 {/key}
 
-<hr>
-
-<button on:click={() => { roomOptions = (roomOptions === true) ? false : true}}>Create your room</button>
 <!-- <button on:click|preventDefault={getOwningRooms} type="submit">delete room</button> -->
 
 <!-- {#if toDelete === true}
@@ -171,17 +199,21 @@
 	</form>
 {/if}
 
-{#key chat}
-	<ChatRoom {chat} />
+{#key $roomSelected}
+	<ChatRoom chat={$roomSelected} />
 {/key}
 
 <style>
+	#outer-container {
+		height: 25%;
+		position: relative;
+	}
 	#room-container {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: stretch;
 		justify-content: center;
-		max-height: 20%;
+		max-height: 80%;
 		overflow: auto;
 	}
 
@@ -269,6 +301,20 @@
 
 	li > button:hover {
 		border: none;
+	}
+
+	#insert-password {
+		background-color: black;
+		position: absolute;
+		color: white;
+		width: 100%;
+		margin: 0;
+		height: 60%;
+		visibility: hidden;
+	}
+
+	#insert-password > p {
+		margin: 0;
 	}
 
 </style>

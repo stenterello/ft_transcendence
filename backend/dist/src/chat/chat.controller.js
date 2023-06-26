@@ -58,10 +58,15 @@ let ChatController = class ChatController {
     }
     createRoom(room, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const pwd = (0, bcrypt_1.encodePassword)(data.get('password'));
+            const tmpPwd = data.get('password');
+            console.log(tmpPwd);
+            let pwd = null;
+            if (tmpPwd) {
+                pwd = (0, bcrypt_1.encodePassword)(tmpPwd);
+            }
             const user = data.get("user");
             let roomDto = { name: room, password: pwd !== null ? pwd : null, admins: [user], banlist: [], members: [user] };
-            console.log("create room " + room + ' ' + pwd);
+            console.log("create room: " + room + ' password: ' + pwd);
             return yield this.chatService.createRoom(roomDto);
         });
     }

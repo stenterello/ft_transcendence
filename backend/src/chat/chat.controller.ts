@@ -40,10 +40,15 @@ export class ChatController {
 
     @Post("create/:room")
     async createRoom(@Param('room') room: string, @Body() data: Map<string, string>) {
-        const pwd = encodePassword(data.get('password')!);
+        const tmpPwd = data.get('password');
+        console.log(tmpPwd)
+        let pwd = null;
+        if (tmpPwd) {
+            pwd = encodePassword(tmpPwd);
+        }
         const user = data.get("user");
         let roomDto = {name: room, password: pwd !== null ? pwd! : null, admins: [user!], banlist: [], members: [user!]};
-        console.log("create room " + room + ' ' + pwd);
+        console.log("create room: " + room + ' password: ' + pwd);
         return await this.chatService.createRoom(roomDto);
     }
 

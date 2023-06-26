@@ -17,10 +17,16 @@
 	})
 
 	function	show_page(event): void {
-		if ($userInfo === undefined)
+		if ($userInfo === undefined && event.detail.userInfo === undefined)
+		{
 			retrieveInfo();
+		}
 		if (event.detail.userInfo !== undefined)
+		{
+			console.log('qua')
 			$userInfo = event.detail.userInfo;
+			console.log($userInfo['username']);
+		}
 		if (event.detail.bearer !== undefined && $userInfo !== undefined)
 			$userInfo['access_token'] = event.detail.bearer;
 		history.pushState({"href_to_show": event.detail.path}, "", event.detail.path);
@@ -117,6 +123,8 @@
 	async function	retrieveInfo(): Promise<void> {
 		let cookie: string = getCookie('transcendence_session');
 		const	b:	boolean = await isCookieValid(cookie);
+		if ($page_shown === "/2faToken")
+			return ;
 		if (b === false)
 			deleteCookie('transcendence_session');
 		else if ($page_shown === "/" || $page_shown === "/register" || $page_shown === "/2faToken")
@@ -126,7 +134,9 @@
 		}
 		cookie = getCookie('transcendence_session');
 		if ($page_shown === "/register" || (window.location.search !== "" && $page_shown.startsWith("/profile?user=") === false))
+		{
 			return null;
+		}
 		if (cookie.length === 0 && $page_shown !== "/2faToken")
 		{
 			resetHome();

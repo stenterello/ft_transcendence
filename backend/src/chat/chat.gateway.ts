@@ -310,6 +310,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
           return ;
         }
       }
+      console.log('ale')
+      console.log(json['room'])
+      console.log(user.username)
       await this.chatRepository.addMember(json['room'], user.username);
       return await this.server.in(client.id).socketsJoin(room.name);
     }
@@ -472,6 +475,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    console.log('qui');
+    console.log(room)
+    console.log(user);
     if (room && user) {
       const mutelist = room.mutelist;
       if (mutelist.includes(user.username)) {

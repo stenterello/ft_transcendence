@@ -73,6 +73,7 @@ export class AuthController {
     async authenticate(@Req() request: Request, @Body() body: Map<string, string>) {
         const name = body.get('username');
         const twofa = body.get('twoFactorAuthenticationCode');
+        console.log('entrato')
         if (name && twofa) {
             const user = await this.userService.findByName(name);
             const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(twofa, user);

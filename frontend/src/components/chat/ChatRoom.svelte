@@ -35,7 +35,7 @@
             {:then messages}
                 <div id="messages">
                     <h4>{roomInfo['name']}</h4>
-                    {#if messages.length > 0}
+                    {#if Object.values(messages).length > 0}
                         <ul>
 
                         </ul>

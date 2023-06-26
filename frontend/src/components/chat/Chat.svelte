@@ -1,7 +1,7 @@
 <script lang="ts">
 
 	import { createEventDispatcher } from 'svelte';
-	import { chat, socket, userInfo, bearer, userSelected } from '../../data';
+	import { chat, socket, userInfo, bearer, userSelected, roomSelected } from '../../data';
 	import GeneralChat from './GeneralChat.svelte';
 	import Rooms from './Rooms.svelte';
 	import PrivateMessages from './PrivateMessages.svelte';
@@ -31,7 +31,10 @@
 				$socket.emit('general', messages); break ;
 			}
 			case 1: {
-				$socket.emit('room', messages); break ;
+				$socket.emit('sendToRoom', JSON.stringify({'room': $roomSelected, 'message': messages}));
+				console.log('fatto');
+				console.log( JSON.stringify({'room': $roomSelected, 'message': messages}));
+				break ;
 			}
 			case 2: {
 				$socket.emit('private message', JSON.stringify({ user: $userSelected, message: messages }));
@@ -79,8 +82,8 @@
 	{/if}
 	<div id="chat-window" style="height: {height}">
 		<div id="menu">
-			<button on:click={() => { tab = 0; $userSelected = undefined; } } style="color: #d61a1f;">general chat</button>
-			<button on:click={() => { tab = 1; $userSelected = undefined; } } style="color: white;">rooms</button>
+			<button on:click={() => { tab = 0; $userSelected = undefined; $roomSelected = undefined; } } style="color: #d61a1f;">general chat</button>
+			<button on:click={() => { tab = 1; $userSelected = undefined; $roomSelected = undefined; } } style="color: white;">rooms</button>
 			<button on:click={() => tab = 2} style="color: #fcd612;">private messages</button>
 		</div>
 		{#if tab === 0}
