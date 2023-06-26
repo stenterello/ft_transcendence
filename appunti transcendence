@@ -9,7 +9,7 @@ Problemi:
     ## ROOM ##
     - creare finestra di setting della room da frontend
     - se l'utente crea una room con un nome già esistente, il backend deve tornare un codice di errore specifico (al momento è 500 quindi non indica l'errore)
-    - se l'utente prova ad accedere a una room protetta, deve esserci qualcosa che segnala che sia protetta, così da richiedergli la password
     - le room private devono essere visibili nell'elenco a tutti gli utenti oppure no? Al momento lo sono
     - il socket "sendToRoom" non aggiunge il messaggio al database della room
     - se si fa joinRoom con password non c'è gestione della password errata da backend, quindi nemmeno da frontend
+    - alcune operazioni (come joinRoom o altro, forse sarebbe meglio implementarle come API poiché la risposta HTTP del backend può essere fondamentale per gestire gli errori)
