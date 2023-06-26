@@ -5,22 +5,37 @@
 	import { socket } from "../../data";
 
 	let			roomOptions: boolean = false;
-	let      toDelete: boolean = false;
-  	let      owningRooms: Array<string> = [];
+	let     	toDelete: boolean = false;
+  	let     	owningRooms: Array<string> = [];
+	let			ownedRooms: Array<Object> = [];
+	let			otherRooms: Array<Object> = [];
 	let			rooms: Array<Object> = [];
 	let			chat: string | null = null;
 	let			roomInfo: Object | null = null;
+	let			roomChange: boolean = false;
 
 	async function	getRooms(): Promise<Array<Object>> {
 		const	res: Response = await fetch('http://localhost:3000/chat/rooms');
+		let		ret: Array<Object> = [];
 		if (res.ok)
 		{
 			const	json: Object = await res.json();
-			const	ret: Array<Object> = [];
 			for (let i = 0; i < Object.keys(json).length; i++) {
 				ret.push(json[i]);
 			}
-			return ret;
+		}
+		otherRooms = [];
+		ownedRooms = [];
+		if (Object.keys(ret).length === 0) {
+			return ;
+		}
+		else {
+			for (let i = 0; i < Object.keys(ret).length; i++) {
+				if (ret[i]['admins'].includes($userInfo['username']))
+					ownedRooms.push(ret[i]);
+				else
+					otherRooms.push(ret[i]);
+			}
 		}
 	}
 
@@ -52,8 +67,7 @@
 			},
 			body: JSON.stringify(json)
 		});
-
-		rooms = await getRooms();
+		roomChange = (roomChange) ? false : true;		
 	}
 
 	async function	chooseRoom(event): Promise<void> {
@@ -61,22 +75,18 @@
 		roomInfo = rooms.find(elem => elem['name'] === chat);
 	}
 
-	async function	loadRooms(): Promise<void> {
-		rooms = await getRooms();
-	}
-
 	async function getOwningRooms(): Promise<Array<Object>> {
 		const  res: Response = await fetch('http://localhost:3000/chat/rooms');
 		if (res.ok)
 		{
-		owningRooms = [];
-		const  json: Object = await res.json();
-		for (let i = 0; i < Object.keys(json).length; i++) {
-			owningRooms.push(json[i]['name']);
-		}
-		console.log(owningRooms);
-		toDelete = true;
-		return owningRooms;
+			owningRooms = [];
+			const  json: Object = await res.json();
+			for (let i = 0; i < Object.keys(json).length; i++) {
+				owningRooms.push(json[i]['name']);
+			}
+			console.log(owningRooms);
+			toDelete = true;
+			return owningRooms;
 		}
 	}
 
@@ -85,28 +95,50 @@
 		$socket.emit("deleteRoom", chat);
 	}
 
-	loadRooms();
+	function	roomPrivacy(room: Object): string {
+		if (room['password'] === null)
+			return '[public]';
+		else
+			return '[protected]';
+	}
 
 </script>
 
-{#key rooms}
-	{#if rooms.length === 0}
-		<p>No rooms yet</p>
-	{:else}
-		<ul>
-			{#each rooms as room}
-				<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button></li>
-			{/each}
-		</ul>
-	{/if}
+{#key roomChange}
+	{#await getRooms()}
+		<p>loading rooms</p>
+	{:then} 
+		<div id="room-container">
+			<h3>rooms available</h3>
+			<h3>your rooms</h3>
+			{#if otherRooms.length === 0}
+				<p>No rooms</p>
+			{:else}
+				<ul>
+					{#each otherRooms as room}
+						<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button><span>{roomPrivacy(room)}</span></li>
+					{/each}
+				</ul>
+			{/if}
+			{#if ownedRooms.length === 0}
+				<p>No owned rooms</p>
+			{:else}
+				<ul>
+					{#each ownedRooms as room}
+						<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button></li>
+					{/each}
+				</ul>
+			{/if}
+			</div>
+	{/await}
 {/key}
 
 <hr>
 
 <button on:click={() => { roomOptions = (roomOptions === true) ? false : true}}>Create your room</button>
-<button on:click|preventDefault={getOwningRooms} type="submit">delete room</button>
+<!-- <button on:click|preventDefault={getOwningRooms} type="submit">delete room</button> -->
 
-{#if toDelete === true}
+<!-- {#if toDelete === true}
     {#key owningRooms}
       {#if owningRooms.length === 0}
         <p>No rooms yet</p>
@@ -118,10 +150,11 @@
         </ul>
       {/if}
     {/key}
-{/if}
+{/if} -->
 
 {#if roomOptions === true}
 	<form>
+		<button on:click={() => { roomOptions = (roomOptions === true) ? false : true}} style="position: absolute; background-color: black; width: 4%; height: 9%; border-radius: 1vw; top: 5px; right: 5px; padding: 0; background: url('cross.png') no-repeat; background-size: cover;"></button>
 		<label for="room-name">Insert room name</label>
 		<input id="room-name" name="room-name" type="text" placeholder="insert room name">
 		<br>
@@ -143,12 +176,48 @@
 {/key}
 
 <style>
+	#room-container {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: stretch;
+		justify-content: center;
+		max-height: 20%;
+		overflow: auto;
+	}
+
+	#room-container > h3, #room-container > ul {
+		margin: 0;
+		padding: 0;
+	}
+
+	#room-container > p {
+		color: black;
+		max-width: fit-content;
+		margin: 0 auto;
+	}
+
+	#room-container > h3 {
+		flex-basis: 50%;
+		font-family: 'TrashHand';
+		color: black;
+	}
+
+	#room-container > ul {
+		flex-basis: 49%;
+		background-color: white;
+		overflow: auto;
+	}
+
+	#room-container > ul:first-of-type {
+		border-right: 1px solid black;
+	}
+
 	form {
 		border: 1px solid black;
 		border-radius: 1vw;
 		width: fit-content;
 		margin: 30px auto;
-		padding: 15px;
+		padding: 25px 15px 15px;
 		z-index: 2;
 		position: relative;
 		background-color: inherit;
@@ -171,6 +240,21 @@
 	li {
 		border: 1px solid black;
 		margin: 7px auto;
+		width: 60%;
+		height: fit-content;
+	}
+
+	li > span {
+		font-size: 0.8em;
+		margin: 0;
+		padding: 0;
+	}
+
+	button {
+		background-color: black;
+		color: #fcd612;
+		border-radius: 0;
+		padding: 3% 20%;
 	}
 	
 	li:hover {
@@ -180,6 +264,7 @@
 	li > button {
 		background-color: unset;
 		width: 100%;
+		color: black;
 	}
 
 	li > button:hover {
