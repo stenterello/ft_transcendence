@@ -1,4 +1,4 @@
-import { Rooms } from "@prisma/client";
+import { Rooms, Prisma } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
 import { ChatGateway } from "./chat.gateway";
 import { RoomDto } from "./room.dto";
@@ -10,7 +10,7 @@ export declare class ChatService {
     private prisma;
     constructor(chatGateway: ChatGateway, prisma: PrismaService);
     showAll(): Promise<Rooms[]>;
-    clearAll(): Promise<import(".prisma/client").Prisma.BatchPayload>;
+    clearAll(): Promise<Prisma.BatchPayload>;
     showRoom(room: string): Promise<{
         author: string;
         message: string;
@@ -23,9 +23,9 @@ export declare class ChatService {
         members: string[];
     } | null>;
     msgFromUser(room: string, sender: string): Promise<{
-        createdAt: Date;
         author: string;
         message: string;
+        createdAt: Date;
     }[]>;
     createRoom(room: RoomDto): Promise<Rooms>;
     deleteRoom(admin: string, room: string): Promise<void>;

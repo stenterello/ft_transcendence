@@ -1,4 +1,4 @@
-import { User, Prisma } from "@prisma/client";
+import { User, Prisma, Rooms, Matches } from "@prisma/client";
 import { Injectable, BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "prisma/prisma.service";
 import {
@@ -48,7 +48,11 @@ export class UserService {
   }
 
   async delAll() {
+    await this.prisma.matches.deleteMany();
+    await this.prisma.rooms.deleteMany();
+    await this.prisma.chat.deleteMany();
     return await this.prisma.user.deleteMany();
+
   }
 
   async findByCookie(userCookie: string) {

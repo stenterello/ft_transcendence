@@ -105,7 +105,17 @@ let ChatService = class ChatService {
     }
     createRoom(room) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.prisma.rooms.create({ data: room });
+            try {
+                return yield this.prisma.rooms.create({ data: room });
+            }
+            catch (e) {
+                if (e instanceof client_1.Prisma.PrismaClientKnownRequestError) {
+                    if (e.code == "P2002") {
+                        throw new common_1.BadRequestException("Room already exists");
+                    }
+                }
+                throw e;
+            }
         });
     }
     deleteRoom(admin, room) {

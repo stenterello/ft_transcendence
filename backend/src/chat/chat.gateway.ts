@@ -300,19 +300,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const pwd = json['password'];
     if (user && room) {
       if (room.banlist.includes(user.username)) {
         throw new ForbiddenException("User banned!");
       }
       if (room.password !== null) {
-        if (!comparePassword(json['password'], room.password)) {
-          console.log("wrong password!");
-          return ;
+        if (!comparePassword(room.password, json['password']) || !pwd) {
+          throw new BadRequestException("wrong password");
         }
       }
-      console.log('ale')
-      console.log(json['room'])
-      console.log(user.username)
       await this.chatRepository.addMember(json['room'], user.username);
       return await this.server.in(client.id).socketsJoin(room.name);
     }
@@ -354,7 +351,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(data);
     if (user && room && room.admins.includes(user.username)) {
       const arr = await this.chatRepository.getRoomMembers(room.name);
-      if (arr) {
+      if (arr && arr.length > 0) {
         this.server.in(arr).socketsLeave(room.name);
       }
       return await this.prisma.rooms.delete({ where: { name: room.name }});
@@ -475,14 +472,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
-    console.log('qui');
-    console.log(room)
-    console.log(user);
     if (room && user) {
       const mutelist = room.mutelist;
       if (mutelist.includes(user.username)) {
         return ("user muted");
       } else {
+        await this.prisma.chat.create({
+          data: { room: json['room'], author: user.username, message: json['message'] },
+
+        })
         return await this.server.emit(json['room'], json['message']);
       }
     }

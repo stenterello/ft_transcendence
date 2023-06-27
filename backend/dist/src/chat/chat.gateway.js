@@ -306,19 +306,16 @@ let ChatGateway = class ChatGateway {
             const json = JSON.parse(data);
             const user = yield this.userService.findBySocket(client.id);
             const room = yield this.chatRepository.getRooms(json['room']);
+            const pwd = json['password'];
             if (user && room) {
                 if (room.banlist.includes(user.username)) {
                     throw new common_1.ForbiddenException("User banned!");
                 }
                 if (room.password !== null) {
-                    if (!(0, bcrypt_1.comparePassword)(json['password'], room.password)) {
-                        console.log("wrong password!");
-                        return;
+                    if (!(0, bcrypt_1.comparePassword)(room.password, json['password']) || !pwd) {
+                        throw new common_1.BadRequestException("wrong password");
                     }
                 }
-                console.log('ale');
-                console.log(json['room']);
-                console.log(user.username);
                 yield this.chatRepository.addMember(json['room'], user.username);
                 return yield this.server.in(client.id).socketsJoin(room.name);
             }
@@ -360,7 +357,7 @@ let ChatGateway = class ChatGateway {
             const room = yield this.chatRepository.getRooms(data);
             if (user && room && room.admins.includes(user.username)) {
                 const arr = yield this.chatRepository.getRoomMembers(room.name);
-                if (arr) {
+                if (arr && arr.length > 0) {
                     this.server.in(arr).socketsLeave(room.name);
                 }
                 return yield this.prisma.rooms.delete({ where: { name: room.name } });
@@ -481,15 +478,15 @@ let ChatGateway = class ChatGateway {
             const json = JSON.parse(data);
             const user = yield this.userService.findBySocket(client.id);
             const room = yield this.chatRepository.getRooms(json['room']);
-            console.log('qui');
-            console.log(room);
-            console.log(user);
             if (room && user) {
                 const mutelist = room.mutelist;
                 if (mutelist.includes(user.username)) {
                     return ("user muted");
                 }
                 else {
+                    yield this.prisma.chat.create({
+                        data: { room: json['room'], author: user.username, message: json['message'] },
+                    });
                     return yield this.server.emit(json['room'], json['message']);
                 }
             }

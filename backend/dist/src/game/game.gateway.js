@@ -123,7 +123,7 @@ let GameGateway = class GameGateway {
                 this.matchId = match.id;
             }
             this.game = new game_class_1.Game(this.server, this.prisma, this.P1Sock, this.P2Sock, this.matchId);
-            yield this.game.loopGame("official").then((ret) => {
+            yield this.game.loopGame("official").then(() => {
                 this.bool = false;
                 this.P1Sock = "";
                 this.P2Sock = "";

@@ -62,6 +62,9 @@ let UserService = class UserService {
     }
     delAll() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.prisma.matches.deleteMany();
+            yield this.prisma.rooms.deleteMany();
+            yield this.prisma.chat.deleteMany();
             return yield this.prisma.user.deleteMany();
         });
     }

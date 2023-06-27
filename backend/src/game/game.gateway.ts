@@ -115,7 +115,7 @@ import {
             this.matchId = match.id;
         }
         this.game = new Game(this.server, this.prisma, this.P1Sock, this.P2Sock, this.matchId);
-        await this.game.loopGame("official").then((ret) => {
+        await this.game.loopGame("official").then(() => {
             this.bool = false;
             this.P1Sock = "";
             this.P2Sock = "";

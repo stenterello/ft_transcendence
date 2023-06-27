@@ -74,7 +74,7 @@ export class Game {
 
     public increaseP2() { return this.P2++; }
     
-    public resetGame() {
+    public async resetGame() {
         this.ballCordX = 50;
         this.ballCordY = 50;
         Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirX = 1 : this.ballDirX = -1;
@@ -83,6 +83,7 @@ export class Game {
         this.RPY = 35;
         this.speed = 2;
         this.wallSpeed = 2;
+        await this.delay(3000);
     }
 
     public async loopGame(type: string) {
@@ -197,6 +198,11 @@ export class Game {
 
     public async remSpec(client: string) {
         return this.spectators.splice(this.spectators.indexOf(client), 1);
+    }
+
+
+    public async delay(ms: number) {
+        return new Promise( resolve => setTimeout(resolve, ms) );
     }
 
   }

@@ -74,14 +74,17 @@ class Game {
     increaseP1() { return this.P1++; }
     increaseP2() { return this.P2++; }
     resetGame() {
-        this.ballCordX = 50;
-        this.ballCordY = 50;
-        Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirX = 1 : this.ballDirX = -1;
-        Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirY = 1 : this.ballDirY = -1;
-        this.LPY = 35;
-        this.RPY = 35;
-        this.speed = 2;
-        this.wallSpeed = 2;
+        return __awaiter(this, void 0, void 0, function* () {
+            this.ballCordX = 50;
+            this.ballCordY = 50;
+            Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirX = 1 : this.ballDirX = -1;
+            Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirY = 1 : this.ballDirY = -1;
+            this.LPY = 35;
+            this.RPY = 35;
+            this.speed = 2;
+            this.wallSpeed = 2;
+            yield this.delay(3000);
+        });
     }
     loopGame(type) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -201,6 +204,11 @@ class Game {
     remSpec(client) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.spectators.splice(this.spectators.indexOf(client), 1);
+        });
+    }
+    delay(ms) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise(resolve => setTimeout(resolve, ms));
         });
     }
 }

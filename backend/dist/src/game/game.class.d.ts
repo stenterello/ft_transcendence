@@ -34,10 +34,11 @@ export declare class Game {
     moveDown(sock: string): void;
     increaseP1(): number;
     increaseP2(): number;
-    resetGame(): void;
+    resetGame(): Promise<void>;
     loopGame(type: string): Promise<unknown>;
     update(): void;
     endGame(type: string): Promise<void>;
     addSpect(client: string): Promise<number>;
     remSpec(client: string): Promise<string[]>;
+    delay(ms: number): Promise<unknown>;
 }

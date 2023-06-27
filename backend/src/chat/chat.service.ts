@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaClient, Rooms } from "@prisma/client";
+import { Injectable, BadRequestException } from "@nestjs/common";
+import { PrismaClient, Rooms, Prisma } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
 import { ChatGateway } from "./chat.gateway";
 import { RoomDto } from "./room.dto";
@@ -83,7 +83,16 @@ export class ChatService {
 	}
 
 	async createRoom(room: RoomDto) {
-		return await this.prisma.rooms.create({data: room});
+		try {
+			return await this.prisma.rooms.create({data: room});
+		} catch (e) {
+			if (e instanceof Prisma.PrismaClientKnownRequestError) {
+				if (e.code == "P2002") {
+					throw new BadRequestException("Room already exists");
+				}
+			}
+			throw e;
+		}
 	}
 
 	async deleteRoom(admin: string, room: string) {
