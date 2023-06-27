@@ -12,7 +12,6 @@
 	async function	getNotifications(): Promise<void> {
 		const	response: Response = await fetch('http://localhost:3000/users/events/' + $userInfo['username']);
 		const	json: Object = await response.json();
-		console.log(json['events']);
 		$events = Array.from(Object.values(json['events']));
 	}
 

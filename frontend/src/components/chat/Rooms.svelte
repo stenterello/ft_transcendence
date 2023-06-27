@@ -88,8 +88,13 @@
 
 	async function	tryPassword(room: string, password: string): Promise<void> {
 		$roomSelected = room;
-		if (roomInfo['members'].includes($userInfo['username'] === false)) {
-			$socket.emit('joinRoom', JSON.stringify({'room': $roomSelected, 'password': password}));
+		const bool = await roomInfo['members'].includes($userInfo['username']);
+		if (bool === false) {
+			$socket.emit('joinRoom', JSON.stringify({'room': $roomSelected, 'password': password}), (res) => {
+				if (res === false) {
+					return ;
+				} // se false la password non è corretta
+			});
 		}
 	}
 

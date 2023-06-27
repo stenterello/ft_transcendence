@@ -32,7 +32,6 @@
 			}
 			case 1: {
 				$socket.emit('sendToRoom', JSON.stringify({'room': $roomSelected, 'message': messages}));
-				console.log('fatto');
 				console.log( JSON.stringify({'room': $roomSelected, 'message': messages}));
 				break ;
 			}

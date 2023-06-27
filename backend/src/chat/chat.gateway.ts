@@ -306,12 +306,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         throw new ForbiddenException("User banned!");
       }
       if (room.password !== null) {
-        if (!comparePassword(room.password, json['password']) || !pwd) {
-          throw new BadRequestException("wrong password");
+        if (!comparePassword(json['password'], room.password) || !pwd) {
+          console.log("compare");
+          return false;
         }
       }
+      console.log("password ok");
       await this.chatRepository.addMember(json['room'], user.username);
-      return await this.server.in(client.id).socketsJoin(room.name);
+      await this.server.in(client.id).socketsJoin(room.name);
+      return true;
     }
   }
 

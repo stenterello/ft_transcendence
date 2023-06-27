@@ -312,12 +312,15 @@ let ChatGateway = class ChatGateway {
                     throw new common_1.ForbiddenException("User banned!");
                 }
                 if (room.password !== null) {
-                    if (!(0, bcrypt_1.comparePassword)(room.password, json['password']) || !pwd) {
-                        throw new common_1.BadRequestException("wrong password");
+                    if (!(0, bcrypt_1.comparePassword)(json['password'], room.password) || !pwd) {
+                        console.log("compare");
+                        return false;
                     }
                 }
+                console.log("password ok");
                 yield this.chatRepository.addMember(json['room'], user.username);
-                return yield this.server.in(client.id).socketsJoin(room.name);
+                yield this.server.in(client.id).socketsJoin(room.name);
+                return true;
             }
         });
     }

@@ -26,7 +26,7 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     } | undefined>;
     sendPrivateMsg(client: Socket, data: any): Promise<"Don't be silly, you can't send a message to yourself!" | undefined>;
     delConv(client: Socket, data: any): Promise<User | undefined>;
-    joinRoom(client: Socket, data: any): Promise<void>;
+    joinRoom(client: Socket, data: any): Promise<boolean | undefined>;
     leaveRoom(client: Socket, data: any): Promise<void>;
     changePwd(client: Socket, data: any): Promise<Rooms | undefined>;
     deleteRoom(client: Socket, data: string): Promise<Rooms>;

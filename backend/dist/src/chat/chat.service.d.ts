@@ -23,9 +23,9 @@ export declare class ChatService {
         members: string[];
     } | null>;
     msgFromUser(room: string, sender: string): Promise<{
+        createdAt: Date;
         author: string;
         message: string;
-        createdAt: Date;
     }[]>;
     createRoom(room: RoomDto): Promise<Rooms>;
     deleteRoom(admin: string, room: string): Promise<void>;

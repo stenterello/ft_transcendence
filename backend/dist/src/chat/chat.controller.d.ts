@@ -17,9 +17,9 @@ export declare class ChatController {
         members: string[];
     } | null>;
     getUserPrivateMsg(room: string, sender: string): Promise<{
+        createdAt: Date;
         author: string;
         message: string;
-        createdAt: Date;
     }[]>;
     createRoom(room: string, data: Map<string, string>): Promise<Rooms>;
     clearRooms(): Promise<import(".prisma/client").Prisma.BatchPayload>;
