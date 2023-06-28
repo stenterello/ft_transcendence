@@ -28,6 +28,11 @@
         $roomSelected = undefined;
     }
 
+    function    deleteRoom(): void {
+        $socket.emit('deleteRoom', JSON.stringify({'room': $roomSelected}))
+        $roomSelected = undefined;
+    }
+
     function    demoteAdmin(user: string): void {
         $socket.emit('demoteAdmin', JSON.stringify({'user': user, 'room': $roomSelected}));
         optionChange = (optionChange) ? false : true;
@@ -77,7 +82,7 @@
     <section id="chat-space">
         {#if chat !== null}
             {#key $statusChange}
-                <OnlineUsers users={roomInfo['members']} --height="25%" />
+                <OnlineUsers users={roomInfo['members']} --height="25%" on:message />
             {/key}
             {#await getMessages()}
                 <p>loading</p>
@@ -100,7 +105,7 @@
                                 {#if roomInfo['password'] !== null}
                                     <button on:click|preventDefault={changePassword}>Change password</button>
                                 {/if}
-                                <button on:click|preventDefault={leaveRoom}>Delete room</button>
+                                <button on:click|preventDefault={deleteRoom}>Delete room</button>
                                 <h4>Members management</h4>
                                 <ul class="member-options">
                                     {#each roomInfo['members'] as member}

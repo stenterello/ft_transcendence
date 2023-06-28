@@ -6,7 +6,7 @@
 
 	const grant_type: string = 'authorization_code';
 	const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
-	const client_secret: string = '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';
+	const client_secret: string = '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';
 	const redirect_uri: string = 'http://localhost:5173/';
 
 	function craftPayload(code: string): string {

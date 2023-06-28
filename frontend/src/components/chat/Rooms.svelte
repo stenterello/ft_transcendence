@@ -62,14 +62,30 @@
 			password = document.getElementById('room-password-create').value;
 		const	json: Object = { user: $userInfo['username'], password: password };
 
-		await fetch('http://localhost:3000/chat/create/' + roomName, {
+		const	response: Response = await fetch('http://localhost:3000/chat/create/' + roomName, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json'
 			},
 			body: JSON.stringify(json)
 		});
-		roomChange = (roomChange) ? false : true;		
+		if (response.status === 400)
+		{
+			if (document.getElementById('room-creation-err') === null) {
+				const	err: HTMLElement = document.createElement('span');
+				const	errText: Text = document.createTextNode('Room already exists');
+				err.appendChild(errText);
+				err.style.color = 'red';
+				err.setAttribute('id', 'room-creation-err');
+				document.getElementById('room-creation').appendChild(err);
+			}
+		}
+		else {
+			roomChange = (roomChange) ? false : true;
+			if (document.getElementById('room-creation-err') !== null)
+				document.getElementById('room-creation-err').remove();
+			roomOptions = false;
+		}
 	}
 
 	async function	chooseRoom(event): Promise<void> {
@@ -87,35 +103,26 @@
 	}
 
 	async function	tryPassword(room: string, password: string): Promise<void> {
-		$roomSelected = room;
+		
 		const bool = await roomInfo['members'].includes($userInfo['username']);
 		if (bool === false) {
-			$socket.emit('joinRoom', JSON.stringify({'room': $roomSelected, 'password': password}), (res) => {
+			$socket.emit('joinRoom', JSON.stringify({'room': room, 'password': password}), (res) => {
 				if (res === false) {
+					if (document.getElementById('insert-password-err') === null) {
+						const	err: HTMLElement = document.createElement('span');
+						const	errText: Text = document.createTextNode('wrong password');
+						err.appendChild(errText);
+						err.style.color = 'red';
+						err.setAttribute('id', 'insert-password-err');
+						document.getElementById('insert-password').appendChild(err);
+					}
 					return ;
-				} // se false la password non è corretta
+				}
+				else {
+					$roomSelected = room;
+				}
 			});
 		}
-	}
-
-	async function getOwningRooms(): Promise<Array<Object>> {
-		const  res: Response = await fetch('http://localhost:3000/chat/rooms');
-		if (res.ok)
-		{
-			owningRooms = [];
-			const  json: Object = await res.json();
-			for (let i = 0; i < Object.keys(json).length; i++) {
-				owningRooms.push(json[i]['name']);
-			}
-			console.log(owningRooms);
-			toDelete = true;
-			return owningRooms;
-		}
-	}
-
-	async function deleteRoom(event) {
-		chat = event.target.innerHTML;
-		$socket.emit("deleteRoom", chat);
 	}
 
 	function	roomPrivacy(room: Object): string {
@@ -153,12 +160,13 @@
 						{/each}
 					</ul>
 				{/if}
-				<form on:submit|preventDefault={() => tryPassword(room, document.getElementById('room-password').value)} id="insert-password">
+				<form on:submit|preventDefault={() => tryPassword(room, document.getElementById('room-password').value)} id="insert-password" style="padding-top: 10px;">
 					<button on:click={() => { document.getElementById('insert-password').style.visibility = 'hidden'; }} style="position: absolute; background-color: black; width: 4%; height: 11%; border-radius: 1vw; top: 10px; right: 20px; padding: 0; background: url('cross.png') no-repeat; background-size: cover; background-color: white;"></button>
 					<p>This chat room is protected.</p>
 					<p>Insert password</p>
 					<input id="room-password" type="password" required>
 					<input type="submit">
+					<br>
 				</form>
 			</div>
 			<hr>
@@ -169,24 +177,8 @@
 	{/await}
 {/key}
 
-<!-- <button on:click|preventDefault={getOwningRooms} type="submit">delete room</button> -->
-
-<!-- {#if toDelete === true}
-    {#key owningRooms}
-      {#if owningRooms.length === 0}
-        <p>No rooms yet</p>
-      {:else}
-        <ul>
-          {#each owningRooms as room}
-            <li><button on:click|preventDefault={deleteRoom}>{room}</button></li>
-          {/each}
-        </ul>
-      {/if}
-    {/key}
-{/if} -->
-
 {#if roomOptions === true}
-	<form>
+	<form id="room-creation">
 		<button on:click={() => { roomOptions = (roomOptions === true) ? false : true}} style="position: absolute; background-color: black; width: 4%; height: 9%; border-radius: 1vw; top: 5px; right: 5px; padding: 0; background: url('cross.png') no-repeat; background-size: cover;"></button>
 		<label for="room-name">Insert room name</label>
 		<input id="room-name" name="room-name" type="text" placeholder="insert room name">
@@ -201,16 +193,17 @@
 		<br>
 		<br>
 		<input on:click|preventDefault={createRoom} type="submit">
+		<br>
 	</form>
 {/if}
 
 {#key $roomSelected}
-	<ChatRoom chat={$roomSelected} />
+	<ChatRoom chat={$roomSelected} on:message />
 {/key}
 
 <style>
 	#outer-container {
-		height: 25%;
+		height: 21%;
 		position: relative;
 	}
 	#room-container {
@@ -314,7 +307,7 @@
 		color: white;
 		width: 100%;
 		margin: 0;
-		height: 60%;
+		height: 66%;
 		visibility: hidden;
 	}
 

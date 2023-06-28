@@ -1,14 +1,51 @@
-Problemi:
-    - Avrebbe senso inserire nella dinamica del gioco, nel reset game, un socket che metta il backend in attesa, per esempio per emettere un suono da frontend quando un utente fa punto, visualizzare il cambio di punteggio o qualsiasi cosa. Adesso il backend dà gameReady quando il gioco è pronto a essere iniziato, servirebbe qualcosa di analogo da parte frontend che dice che la pagina dell'utente è pronta a far ripartire il gioco
-    - partite private
-    - campo achievement nel database dello user
-    - sistema di backend che verifichi l'acquisizione di achievement
-    - controllare la profile page quanto l'utente si registra (matches) ?????????
+TESTING:
+    - AUTH / LOGIN
+        . register -> working
+        . login -> working
+        . two-factor -> working BUT : when disabling twofa, frontend displays new qr code ---
+                                        it's a problem for backend too, because Google Authenticator creates new code for same user@email
+                                        and the correct one is the latest
+        . cookie -> working
+        . oauth -> working
 
-    ## ROOM ##
-    - Completare Rooms.svelte riga 95
-    - creare finestra di setting della room da frontend
-    - se l'utente crea una room con un nome già esistente, il backend deve tornare un codice di errore specifico (al momento è 500 quindi non indica l'errore) // torna 400 con messaggio "Room already exists"
-    - le room private devono essere visibili nell'elenco a tutti gli utenti oppure no? Al momento lo sono // secondo me no, basta che lo status venga messo a "in game"
-    - se si fa joinRoom con password non c'è gestione della password errata da backend, quindi nemmeno da frontend
-    - alcune operazioni (come joinRoom o altro, forse sarebbe meglio implementarle come API poiché la risposta HTTP del backend può essere fondamentale per gestire gli errori)
+    - CHAT
+        . general messages -> working
+        . general buttons -> working (except invite to play)
+        . private messages not displayed if not open chat
+        . problema ---- arrivano ancora le notifiche dei messaggi (non so perché)
+
+        // Rooms
+            . Errore nel delete room -> il backend dice che non si hanno i permessi per operare tale azione
+            {
+                backend     | [Nest] 158  - 06/28/2023, 1:53:07 PM   ERROR [WsExceptionsHandler] you don't have permission to perform this action
+                backend     | ForbiddenException: you don't have permission to perform this action
+                backend     |     at ChatGateway.<anonymous> (/usr/src/backend/src/chat/chat.gateway.ts:362:11)
+                backend     |     at Generator.next (<anonymous>)
+                backend     |     at fulfilled (/usr/src/backend/dist/src/chat/chat.gateway.js:14:58)
+            }
+            . I messaggi non arrivano nella room
+            . Errore nel leaveRoom di una protected room -> il backend dà questo errore (anche se l'utente è effettivamente cancellato dal campo members)
+            {
+                backend     | [Nest] 158  - 06/28/2023, 2:10:35 PM   ERROR [WsExceptionsHandler] data and hash arguments required
+                backend     | Error: data and hash arguments required
+                backend     |     at Object.compareSync (/usr/src/backend/node_modules/bcrypt/bcrypt.js:166:15)
+                backend     |     at comparePassword (/usr/src/backend/src/utils/bcrypt.ts:10:19)
+                backend     |     at ChatGateway.<anonymous> (/usr/src/backend/src/chat/chat.gateway.ts:309:29)
+                backend     |     at Generator.next (<anonymous>)
+                backend     |     at fulfilled (/usr/src/backend/dist/src/chat/chat.gateway.js:14:58)
+            }
+
+    
+    - USER ACCOUNT
+        . friend request -> working (some little problems which can be ignored)
+        . notification -> working and dismissing correctly
+        . block / unblock -> working
+        . settings -> all working
+
+    - GAME
+        . general -> working
+        . matches viene incrementato due volte dal backend -> se faccio due partite, le userInfo riportano che ho 4 matches nello storico
+        . private game -> to implement
+        . achievement -> to implement
+        . leaderboard -> working
+        . i punteggi della partita vengono dati al contrario: punto per A, ma il punto viene dato a B

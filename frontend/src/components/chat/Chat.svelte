@@ -88,7 +88,7 @@
 		{#if tab === 0}
 			<GeneralChat on:message />
 		{:else if tab === 1}
-			<Rooms />
+			<Rooms on:message />
 		{:else if tab === 2}
 			<PrivateMessages on:select-change={setUserSelected} />
 		{/if}
