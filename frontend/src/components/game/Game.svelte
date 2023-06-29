@@ -83,11 +83,11 @@
                     <CombatLogo user={opponentObj} left={false} points={point2} />
                 {/key}
             {:else}
-                {#key point2}
-                    <CombatLogo user={opponentObj} left={true} points={point2} />
-                {/key}
                 {#key point1}
-                    <CombatLogo user={$userInfo} left={false} points={point1} />
+                    <CombatLogo user={opponentObj} left={true} points={point1} />
+                {/key}
+                {#key point2}
+                    <CombatLogo user={$userInfo} left={false} points={point2} />
                 {/key}
             {/if}
             <section id="game">
