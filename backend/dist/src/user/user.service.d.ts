@@ -13,7 +13,7 @@ export declare class UserService {
     findBySocket(userSocket: string): Promise<User | null>;
     findByName(name: string): Promise<any>;
     findByUser(name: string, password: string): Promise<boolean>;
-    updateUsername(nameDto: UpdateUsernameDto): Promise<User>;
+    updateUsername(nameDto: UpdateUsernameDto): Promise<void>;
     updatePwd(pwd: UpdatePwdDto): Promise<boolean | User>;
     updateEmail(email: UpdateEmailDto): Promise<User>;
     updateAvatar(path: UpdateAvatarDto): Promise<User>;

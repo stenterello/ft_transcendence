@@ -69,7 +69,7 @@ export class AuthController {
     }
 
     @Post('2fa/authenticate')
-    // @UseGuards(Jwt2faAuthGuard)
+    @UseGuards(Jwt2faAuthGuard)
     async authenticate(@Req() request: Request, @Body() body: Map<string, string>) {
         const name = body.get('username');
         const twofa = body.get('twoFactorAuthenticationCode');

@@ -1,6 +1,9 @@
 import { Socket, Server } from 'socket.io';
+import { User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { SubscribeMessage } from '@nestjs/websockets';
+import { UserService } from 'src/user/user.service';
+import { checkAchievement } from 'src/utils/achievement';
 
 export class Game {
     private ballCordX: number = 50;
@@ -15,6 +18,8 @@ export class Game {
     private canvasHeight: number = 100;
     private P1: number = 0;
     private P2: number = 0;
+    private user1: User | null;
+    private user2: User | null;
     private P1Sock: string = "";
     private P2Sock: string = "";
     private interval: any;
@@ -22,19 +27,22 @@ export class Game {
     private timer: number = 0;
     private wallSpeed: number = 2;
     private spectators: Array<string> = [];
+    private isPaused: boolean = false;
     
     constructor(
         private server: Server,
         private prisma: PrismaService,
-        P1sock: string,
-        P2sock: string,
+        player1: User,
+        player2: User,
         id: number
         ) {
-        this.server = server;
-        this.P1Sock = P1sock;
-        this.P2Sock = P2sock;
-        this.matchId = id;
-        this.resetGame();
+            this.user1 = player1;
+            this.user2 = player2;
+            this.server = server;
+            this.P1Sock = this.user1.socketId!;
+            this.P2Sock = this.user2.socketId!;
+            this.matchId = id;
+            this.resetGame();
     }
 
     // Getters
@@ -63,9 +71,9 @@ export class Game {
     }
 
     public moveDown(sock: string) {
-        if (sock === this.P1Sock && this.LPY + this.size < this.canvasHeight) {
+        if (sock === this.P1Sock && this.LPY + this.size <= this.canvasHeight) {
             this.LPY += this.wallSpeed;
-        } else if (sock === this.P2Sock && this.RPY + this.size < this.canvasHeight) {
+        } else if (sock === this.P2Sock && this.RPY + this.size <= this.canvasHeight) {
             this.RPY += this.wallSpeed;
         }
     }
@@ -75,6 +83,9 @@ export class Game {
     public increaseP2() { return this.P2++; }
     
     public async resetGame() {
+        this.isPaused = true;
+        await this.delay(1000);
+        this.isPaused = false;
         this.ballCordX = 50;
         this.ballCordY = 50;
         Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirX = 1 : this.ballDirX = -1;
@@ -83,39 +94,39 @@ export class Game {
         this.RPY = 35;
         this.speed = 2;
         this.wallSpeed = 2;
-        await this.delay(3000);
     }
 
     public async loopGame(type: string) {
-        return new Promise((resolve) => {
-            this.interval = setInterval(() => {
-                if (this.timer == 10) {
-                    this.speed += 1;
-                    this.wallSpeed += 1;
-                    this.timer = 0;
-                }
-                this.timer++;
-                this.ballCordX += (this.ballDirX * this.speed);
-                this.ballCordY += (this.ballDirY * this.speed);
-                this.update();
-                if (this.ballCordX <= 0) {
-                    this.P2++;
-                    this.resetGame();
-                } else if (this.ballCordX >= this.canvasWidth) {
-                    this.P1++;
-                    this.resetGame();
-                } else if (this.ballCordY <= 0 || this.ballCordY >= this.canvasHeight - 3) {
-                    this.ballDirY *= -1;
-                } else if (
-                    (this.ballCordX <= 4 && 
-                        this.ballCordY <= this.LPY + this.size && this.ballCordY >= this.LPY) ||
-                    (this.ballCordX >= this.canvasWidth - 6 &&
-                        this.ballCordY <= this.RPY + this.size && this.ballCordY >= this.RPY)) {
-                    this.ballDirX *= -1;
-                }
-                if (this.P1 === 5 || this.P2 === 5) {
-                    this.endGame(type);
-                    return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
+        return new Promise (async (resolve) => {
+            this.interval = setInterval(async () => {
+                if (this.isPaused === false) {
+                    if (this.timer == 20) {
+                        this.speed += 1;
+                        this.timer = 0;
+                    }
+                    this.timer++;
+                    this.ballCordX += (this.ballDirX * this.speed);
+                    this.ballCordY += (this.ballDirY * this.speed);
+                    this.update();
+                    if (this.ballCordX <= 0) {
+                        this.P2++;
+                        await this.resetGame();
+                    } else if (this.ballCordX >= this.canvasWidth) {
+                        this.P1++;
+                        await this.resetGame();
+                    } else if (this.ballCordY <= 1 || this.ballCordY >= this.canvasHeight - 1) {
+                        this.ballDirY *= -1;
+                    } else if (
+                        (this.ballCordX <= 4 && 
+                            this.ballCordY <= this.LPY + this.size && this.ballCordY >= this.LPY) ||
+                        (this.ballCordX >= this.canvasWidth - 6 &&
+                            this.ballCordY <= this.RPY + this.size && this.ballCordY >= this.RPY)) {
+                        this.ballDirX *= -1;
+                    }
+                    if (this.P1 === 5 || this.P2 === 5) {
+                        this.endGame(type);
+                        return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
+                    }
                 }
             }, 70);
         })
@@ -190,6 +201,9 @@ export class Game {
                 })
             }
         }
+        checkAchievement(this.user1!, this.prisma);
+        checkAchievement(this.user2!, this.prisma);
+
     }
 
     public async addSpect(client: string) {
@@ -199,7 +213,6 @@ export class Game {
     public async remSpec(client: string) {
         return this.spectators.splice(this.spectators.indexOf(client), 1);
     }
-
 
     public async delay(ms: number) {
         return new Promise( resolve => setTimeout(resolve, ms) );

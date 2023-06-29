@@ -10,8 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
+const achievement_1 = require("../utils/achievement");
 class Game {
-    constructor(server, prisma, P1sock, P2sock, id) {
+    constructor(server, prisma, player1, player2, id) {
         this.server = server;
         this.prisma = prisma;
         this.ballCordX = 50;
@@ -29,9 +30,12 @@ class Game {
         this.timer = 0;
         this.wallSpeed = 2;
         this.spectators = [];
+        this.isPaused = false;
+        this.user1 = player1;
+        this.user2 = player2;
         this.server = server;
-        this.P1Sock = P1sock;
-        this.P2Sock = P2sock;
+        this.P1Sock = this.user1.socketId;
+        this.P2Sock = this.user2.socketId;
         this.matchId = id;
         this.resetGame();
     }
@@ -64,10 +68,10 @@ class Game {
         }
     }
     moveDown(sock) {
-        if (sock === this.P1Sock && this.LPY + this.size < this.canvasHeight) {
+        if (sock === this.P1Sock && this.LPY + this.size <= this.canvasHeight) {
             this.LPY += this.wallSpeed;
         }
-        else if (sock === this.P2Sock && this.RPY + this.size < this.canvasHeight) {
+        else if (sock === this.P2Sock && this.RPY + this.size <= this.canvasHeight) {
             this.RPY += this.wallSpeed;
         }
     }
@@ -75,6 +79,9 @@ class Game {
     increaseP2() { return this.P2++; }
     resetGame() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.isPaused = true;
+            yield this.delay(1000);
+            this.isPaused = false;
             this.ballCordX = 50;
             this.ballCordY = 50;
             Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirX = 1 : this.ballDirX = -1;
@@ -83,45 +90,45 @@ class Game {
             this.RPY = 35;
             this.speed = 2;
             this.wallSpeed = 2;
-            yield this.delay(3000);
         });
     }
     loopGame(type) {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve) => {
-                this.interval = setInterval(() => {
-                    if (this.timer == 10) {
-                        this.speed += 1;
-                        this.wallSpeed += 1;
-                        this.timer = 0;
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                this.interval = setInterval(() => __awaiter(this, void 0, void 0, function* () {
+                    if (this.isPaused === false) {
+                        if (this.timer == 20) {
+                            this.speed += 1;
+                            this.timer = 0;
+                        }
+                        this.timer++;
+                        this.ballCordX += (this.ballDirX * this.speed);
+                        this.ballCordY += (this.ballDirY * this.speed);
+                        this.update();
+                        if (this.ballCordX <= 0) {
+                            this.P2++;
+                            yield this.resetGame();
+                        }
+                        else if (this.ballCordX >= this.canvasWidth) {
+                            this.P1++;
+                            yield this.resetGame();
+                        }
+                        else if (this.ballCordY <= 1 || this.ballCordY >= this.canvasHeight - 1) {
+                            this.ballDirY *= -1;
+                        }
+                        else if ((this.ballCordX <= 4 &&
+                            this.ballCordY <= this.LPY + this.size && this.ballCordY >= this.LPY) ||
+                            (this.ballCordX >= this.canvasWidth - 6 &&
+                                this.ballCordY <= this.RPY + this.size && this.ballCordY >= this.RPY)) {
+                            this.ballDirX *= -1;
+                        }
+                        if (this.P1 === 5 || this.P2 === 5) {
+                            this.endGame(type);
+                            return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
+                        }
                     }
-                    this.timer++;
-                    this.ballCordX += (this.ballDirX * this.speed);
-                    this.ballCordY += (this.ballDirY * this.speed);
-                    this.update();
-                    if (this.ballCordX <= 0) {
-                        this.P2++;
-                        this.resetGame();
-                    }
-                    else if (this.ballCordX >= this.canvasWidth) {
-                        this.P1++;
-                        this.resetGame();
-                    }
-                    else if (this.ballCordY <= 0 || this.ballCordY >= this.canvasHeight - 3) {
-                        this.ballDirY *= -1;
-                    }
-                    else if ((this.ballCordX <= 4 &&
-                        this.ballCordY <= this.LPY + this.size && this.ballCordY >= this.LPY) ||
-                        (this.ballCordX >= this.canvasWidth - 6 &&
-                            this.ballCordY <= this.RPY + this.size && this.ballCordY >= this.RPY)) {
-                        this.ballDirX *= -1;
-                    }
-                    if (this.P1 === 5 || this.P2 === 5) {
-                        this.endGame(type);
-                        return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
-                    }
-                }, 70);
-            });
+                }), 70);
+            }));
         });
     }
     update() {
@@ -194,6 +201,8 @@ class Game {
                     });
                 }
             }
+            (0, achievement_1.checkAchievement)(this.user1, this.prisma);
+            (0, achievement_1.checkAchievement)(this.user2, this.prisma);
         });
     }
     addSpect(client) {

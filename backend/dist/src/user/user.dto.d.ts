@@ -5,6 +5,7 @@ export declare class Auth42Dto {
     cookie: string;
     expires: Date;
     isOAuthLogged: boolean;
+    achievement: any;
 }
 export declare class CreateUserDto {
     username: string;
@@ -12,6 +13,7 @@ export declare class CreateUserDto {
     password: string;
     cookie: string;
     expires: Date;
+    achievement: any;
 }
 export declare class UpdateEmailDto {
     email: string;

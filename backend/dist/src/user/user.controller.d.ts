@@ -12,7 +12,7 @@ export declare class UserController {
     delAll(): Promise<import(".prisma/client").Prisma.BatchPayload>;
     auth42Login(auth42Dto: Auth42Dto, response: Response): Promise<void>;
     createUser(createUserDto: CreateUserDto, response: Response, request: Request, client: Socket): Promise<import(".prisma/client").User>;
-    updateName(name: UpdateUsernameDto): Promise<import(".prisma/client").User | undefined>;
+    updateName(name: UpdateUsernameDto): Promise<void>;
     updateMail(mail: UpdateEmailDto): Promise<import(".prisma/client").User | undefined>;
     updatePwd(pwd: UpdatePwdDto, res: Response): Promise<Response<any, Record<string, any>> | undefined>;
     findOneByCookie(cookie: string): Promise<import(".prisma/client").User | null>;

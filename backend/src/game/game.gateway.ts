@@ -23,11 +23,11 @@ import {
     private game: Game
     private P1Sock: string = "";
     private P2Sock: string = "";
-    private p1: string = "";
-    private p2: string = ""
+    private p1: User;
+    private p2: User;
     private bool: boolean = false
     private matchId: number;
-    private queue: Array<string> = [];
+    private queue: Array<User> = [];
 
     @WebSocketServer()
     server: Server;
@@ -88,11 +88,12 @@ import {
         if (this.P1Sock !== "" && this.P2Sock !== "" && this.bool === false) {
             const player1: User | null = await this.userService.findBySocket(this.P1Sock);
             const player2: User | null = await this.userService.findBySocket(this.P2Sock);
-            this.p1 = player1!.username;
-            this.p2 = player2!.username;
+            this.p1 = player1!;
+            this.p2 = player2!;
             this.initialize(client);
         } else if (this.bool === true) {
-            this.queue.unshift(client.id);
+            const user: User | null = await this.userService.findBySocket(client.id);
+            this.queue.unshift(user!);
         }
     }
 
@@ -106,15 +107,15 @@ import {
             data: { matches: { increment: 1 } },
         })
         this.bool = true;
-        this.server.to(this.P1Sock).emit('gameReady', { opponent: this.p2, pos: "left"});
-        this.server.to(this.P2Sock).emit('gameReady', { opponent: this.p1, pos: "right"});
+        this.server.to(this.P1Sock).emit('gameReady', { opponent: this.p2.username, pos: "left"});
+        this.server.to(this.P2Sock).emit('gameReady', { opponent: this.p1.username, pos: "right"});
         const match: Matches | null = await this.prisma.matches.create({
-            data: { type: "official", player1: this.p1, player2: this.p2, score: "0-0" }
+            data: { type: "official", player1: this.p1.username, player2: this.p2.username, score: "0-0" }
         })
         if (match) {
             this.matchId = match.id;
         }
-        this.game = new Game(this.server, this.prisma, this.P1Sock, this.P2Sock, this.matchId);
+        this.game = new Game(this.server, this.prisma, this.p1, this.p2, this.matchId);
         await this.game.loopGame("official").then(() => {
             this.bool = false;
             this.P1Sock = "";
@@ -122,10 +123,14 @@ import {
             this.matchId = -1;
             if (this.queue && this.queue.length > 0) {
                 const p1 = this.queue.pop();
-                this.P1Sock = p1 ? p1 : "";
+                if (p1) {
+                    this.P1Sock = p1.socketId ? p1.socketId : "";
+                }
                 if (this.queue.length > 0) {
                     const p2 = this.queue.pop();
-                    this.P2Sock = p2 ? p2 : "";
+                    if (p2) {
+                        this.P2Sock = p2.socketId ? p2.socketId : "";
+                    }
                     this.initialize(client);
                 }
             }
@@ -197,14 +202,14 @@ import {
     @SubscribeMessage("accept private game")
     async privateAccept(client: Socket, data: any) {
         const json = JSON.parse(data);
-        const p2 = await this.userService.findBySocket(client.id);
-        const p1 = await this.userService.findByName(json['user']);
-        if (json['bool'] === true && p1 && p2 && p1.socketId && p2.socketId) {
-            this.startGame(p1.socketId, p2.socketId);
+        const p2: User | null = await this.userService.findBySocket(client.id)!;
+        const p1: User | null = await this.userService.findByName(json['user'])!;
+        if (json['bool'] === true && p1 && p2) {
+            this.startGame(p1, p2);
         }
     }
 
-    async startGame(p1: string, p2: string) {
+    async startGame(p1: User, p2: User) {
         this.game.push(new Game(this.server, this.prisma, p1, p2, this.matchId++));
         await this.game[this.matchId].loopGame("unofficial");
     }

@@ -60,7 +60,6 @@ export class UserController {
         return this.UserService.create(createUserDto);
     }
 
-
     @Post('update/name')
     async updateName(@Body() name: UpdateUsernameDto) {
         try {

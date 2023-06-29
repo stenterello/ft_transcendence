@@ -36,6 +36,7 @@ model User {
   friendsReq    String[]
   blocklist     String[]
   privateConv   String[]
+  achievement   Json?
 
   @@schema("user")
 }

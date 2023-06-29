@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+import { User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 export declare class Game {
     private server;
@@ -15,6 +16,8 @@ export declare class Game {
     private canvasHeight;
     private P1;
     private P2;
+    private user1;
+    private user2;
     private P1Sock;
     private P2Sock;
     private interval;
@@ -22,7 +25,8 @@ export declare class Game {
     private timer;
     private wallSpeed;
     private spectators;
-    constructor(server: Server, prisma: PrismaService, P1sock: string, P2sock: string, id: number);
+    private isPaused;
+    constructor(server: Server, prisma: PrismaService, player1: User, player2: User, id: number);
     getP1Sock(): string;
     getP2Sock(): string;
     getMatchID(): number;

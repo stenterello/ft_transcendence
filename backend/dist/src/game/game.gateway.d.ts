@@ -1,5 +1,6 @@
 import { OnGatewayDisconnect } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { User } from "@prisma/client";
 import { PrismaService } from 'prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 export declare class GameGateway implements OnGatewayDisconnect {
@@ -21,7 +22,7 @@ export declare class GameGateway implements OnGatewayDisconnect {
     left(client: Socket): Promise<void>;
     up(client: Socket): Promise<void>;
     down(client: Socket): Promise<void>;
-    liveGameOn(client: Socket): Promise<string>;
+    liveGameOn(client: Socket): Promise<User>;
     liveGameOff(client: Socket): Promise<void>;
 }
 export declare class PrivateGameGateway implements OnGatewayDisconnect {
@@ -34,7 +35,7 @@ export declare class PrivateGameGateway implements OnGatewayDisconnect {
     handleDisconnect(client: Socket): Promise<void>;
     inviteGame(client: Socket, data: any): Promise<void>;
     privateAccept(client: Socket, data: any): Promise<void>;
-    startGame(p1: string, p2: string): Promise<void>;
+    startGame(p1: User, p2: User): Promise<void>;
     left(client: Socket): Promise<void>;
     up(client: Socket): Promise<void>;
     down(client: Socket): Promise<void>;

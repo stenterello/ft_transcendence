@@ -23,12 +23,26 @@ const client_1 = require("@prisma/client");
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const bcrypt_1 = require("../utils/bcrypt");
+const json = {
+    "win 1 round": false,
+    "win 5 round": false,
+    "win 10 rounds": false,
+    "win 20 rounds": false,
+    "win 50 rounds": false,
+    "change name": false,
+    "upload avatar": false,
+    "play 1 game": false,
+    "play 10 games": false,
+    "play 20 games": false,
+    "play 50 games": false
+};
 let UserService = class UserService {
     constructor(prisma) {
         this.prisma = prisma;
     }
     auth42(auth42Dto) {
         return __awaiter(this, void 0, void 0, function* () {
+            auth42Dto.achievement = json;
             try {
                 yield this.prisma.user.create({ data: auth42Dto });
             }
@@ -41,6 +55,7 @@ let UserService = class UserService {
         return __awaiter(this, void 0, void 0, function* () {
             const password = (0, bcrypt_1.encodePassword)(createUserDto.password);
             createUserDto.password = password;
+            createUserDto.achievement = json;
             try {
                 return yield this.prisma.user.create({ data: createUserDto });
             }
@@ -115,7 +130,7 @@ let UserService = class UserService {
     updateUsername(nameDto) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.prisma.user.update({
+                const user = yield this.prisma.user.update({
                     where: {
                         username: nameDto.oldUsername,
                     },
@@ -124,6 +139,15 @@ let UserService = class UserService {
                         cookie: nameDto.username + '-token'
                     }
                 });
+                let arr = yield user.achievement;
+                if (arr['change name'] === false) {
+                    arr['change name'] = true;
+                    console.log(arr);
+                    yield this.prisma.user.update({
+                        where: { socketId: user.socketId },
+                        data: { achievement: arr },
+                    });
+                }
             }
             catch (e) {
                 if (e instanceof client_1.Prisma.PrismaClientKnownRequestError) {

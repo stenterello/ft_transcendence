@@ -11,11 +11,26 @@ import {
 } from "./user.dto";
 import { comparePassword, encodePassword } from "src/utils/bcrypt";
 
+const json = {
+  "win 1 round": false,
+  "win 5 round": false,
+  "win 10 rounds": false,
+  "win 20 rounds": false,
+  "win 50 rounds": false,
+  "change name": false,
+  "upload avatar": false,
+  "play 1 game": false,
+  "play 10 games": false,
+  "play 20 games": false,
+  "play 50 games": false
+}
+
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async auth42(auth42Dto: Auth42Dto) {
+    auth42Dto.achievement = json;
     try {
       await this.prisma.user.create({ data: auth42Dto });
     } catch {
@@ -26,6 +41,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const password = encodePassword(createUserDto.password);
     createUserDto.password = password;
+    createUserDto.achievement = json;
     try {
       return await this.prisma.user.create({ data: createUserDto });
     }
@@ -97,7 +113,7 @@ export class UserService {
 
   async updateUsername(nameDto: UpdateUsernameDto) {
     try {
-      return await this.prisma.user.update({
+      const user = await this.prisma.user.update({
         where: {
           username: nameDto.oldUsername,
         },
@@ -106,6 +122,15 @@ export class UserService {
           cookie: nameDto.username + '-token'
         }
       });
+      let arr: any = await user.achievement;
+      if (arr['change name'] === false) {
+        arr!['change name'] = true;
+            console.log(arr);
+            await this.prisma.user.update({
+                where: { socketId: user.socketId! },
+                data: { achievement: arr!},
+            })
+      }
     }
     catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {

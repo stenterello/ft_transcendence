@@ -21,6 +21,8 @@ export class Auth42Dto {
     expires: Date;
 
     isOAuthLogged: boolean;
+
+    achievement: any;
 }
 
 export class CreateUserDto {
@@ -44,6 +46,8 @@ export class CreateUserDto {
     @IsNotEmpty()
     @IsDateString()
     expires: Date;
+
+    achievement: any;
 }
 
 export class UpdateEmailDto {
