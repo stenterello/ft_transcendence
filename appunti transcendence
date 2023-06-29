@@ -12,18 +12,8 @@ TESTING:
         . general messages -> working
         . general buttons -> working (except invite to play)
         . private messages not displayed if not open chat
-        . problema ---- arrivano ancora le notifiche dei messaggi (non so perché)
 
         // Rooms
-            . Errore nel delete room -> il backend dice che non si hanno i permessi per operare tale azione
-            {
-                backend     | [Nest] 158  - 06/28/2023, 1:53:07 PM   ERROR [WsExceptionsHandler] you don't have permission to perform this action
-                backend     | ForbiddenException: you don't have permission to perform this action
-                backend     |     at ChatGateway.<anonymous> (/usr/src/backend/src/chat/chat.gateway.ts:362:11)
-                backend     |     at Generator.next (<anonymous>)
-                backend     |     at fulfilled (/usr/src/backend/dist/src/chat/chat.gateway.js:14:58)
-            }
-            . I messaggi non arrivano nella room
             . Errore nel leaveRoom di una protected room -> il backend dà questo errore (anche se l'utente è effettivamente cancellato dal campo members)
             {
                 backend     | [Nest] 158  - 06/28/2023, 2:10:35 PM   ERROR [WsExceptionsHandler] data and hash arguments required
@@ -34,17 +24,19 @@ TESTING:
                 backend     |     at Generator.next (<anonymous>)
                 backend     |     at fulfilled (/usr/src/backend/dist/src/chat/chat.gateway.js:14:58)
             }
+            . se, nel form di creazione della room, si preme invio invece di cliccare su submit, la creazione non ha luogo,
+                per come la vedo si può ignorare il problema. Fammi sapere che ne pensi
 
-    
+
     - USER ACCOUNT
-        . friend request -> working (some little problems which can be ignored)
+        . friend request -> working
         . notification -> working and dismissing correctly
         . block / unblock -> working
         . settings -> all working
 
     - GAME
         . general -> working
-        . matches viene incrementato due volte dal backend -> se faccio due partite, le userInfo riportano che ho 4 matches nello storico
+        . matches -> working
         . private game -> to implement
         . achievement -> to implement
         . leaderboard -> working

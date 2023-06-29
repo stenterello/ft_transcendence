@@ -2,6 +2,7 @@
 
 	import { userInfo, socket, roomSelected } from "../../data";
 	import ChatRoom from "./ChatRoom.svelte";
+    import RoomCreation from "./RoomCreation.svelte";
 
 	let			roomOptions: boolean = false;
 	let     	toDelete: boolean = false;
@@ -39,54 +40,7 @@
 				rooms.push(ret[i]);
 			}
 		}
-	}
-
-	function	isPassword(event): void {
-		if (event.target.value === 'protected')
-		{
-			const	input: HTMLInputElement = document.createElement('input');
-			input.type = 'text';
-			input.placeholder = 'set your password';
-			input.setAttribute('id', 'room-password-create');
-			const	select: HTMLElement = document.getElementById('room-privacy');
-			select.after(input);
-		}
-		else if (document.getElementById('room-password-create') !== null)
-			document.getElementById('room-password-create').remove();
-	}
-
-	async function	createRoom(): Promise<void> {
-		const	roomName: string = document.getElementById('room-name').value;
-		let		password: string | null = null;
-		if (document.getElementById('room-password-create') !== null)
-			password = document.getElementById('room-password-create').value;
-		const	json: Object = { user: $userInfo['username'], password: password };
-
-		const	response: Response = await fetch('http://localhost:3000/chat/create/' + roomName, {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify(json)
-		});
-		if (response.status === 400)
-		{
-			if (document.getElementById('room-creation-err') === null) {
-				const	err: HTMLElement = document.createElement('span');
-				const	errText: Text = document.createTextNode('Room already exists');
-				err.appendChild(errText);
-				err.style.color = 'red';
-				err.setAttribute('id', 'room-creation-err');
-				document.getElementById('room-creation').appendChild(err);
-			}
-		}
-		else {
-			roomChange = (roomChange) ? false : true;
-			if (document.getElementById('room-creation-err') !== null)
-				document.getElementById('room-creation-err').remove();
-			roomOptions = false;
-		}
-	}
+	}	
 
 	async function	chooseRoom(event): Promise<void> {
 		roomInfo = rooms.find(elem => elem['name'] === event.target.innerHTML);
@@ -178,23 +132,9 @@
 {/key}
 
 {#if roomOptions === true}
-	<form id="room-creation">
-		<button on:click={() => { roomOptions = (roomOptions === true) ? false : true}} style="position: absolute; background-color: black; width: 4%; height: 9%; border-radius: 1vw; top: 5px; right: 5px; padding: 0; background: url('cross.png') no-repeat; background-size: cover;"></button>
-		<label for="room-name">Insert room name</label>
-		<input id="room-name" name="room-name" type="text" placeholder="insert room name">
-		<br>
-		<br>
-		<label for="room-privacy">Set privacy option</label>
-		<select id="room-privacy" on:change={isPassword} >
-			<option value="public">public</option>
-			<option value="protected">protected</option>
-			<option value="private">private</option>
-		</select>
-		<br>
-		<br>
-		<input on:click|preventDefault={createRoom} type="submit">
-		<br>
-	</form>
+	<RoomCreation 
+		on:roomOptions={() => {roomOptions = (roomOptions === true) ? false : true} } 
+		on:roomChange={() => { roomOptions = false; roomChange = (roomChange) ? false : true; } }  />
 {/if}
 
 {#key $roomSelected}
@@ -251,13 +191,6 @@
 		z-index: 2;
 		position: relative;
 		background-color: inherit;
-	}
-
-	label {
-		background-color: aliceblue;
-		border-radius: 3px;
-		padding: 3px;
-		margin: 5px;
 	}
 
 	ul {

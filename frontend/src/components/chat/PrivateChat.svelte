@@ -32,13 +32,6 @@
 		settings = (settings) ? false : true;
 	}
 
-	async function	getNotifications(): Promise<void> {
-		const	response: Response = await fetch('http://localhost:3000/users/events/' + $userInfo['username']);
-		const	json: Object = await response.json();
-		console.log(json['events']);
-		$events = Array.from(Object.values(json['events']));
-	}
-
 	$socket.on('private message', async (info: Object) => {
 		messages = messages.concat({createdAt: '', author: info['from'], message: info['msg']});
 		setTimeout(scrollDown, 50);

@@ -484,7 +484,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
           data: { room: json['room'], author: user.username, message: json['message'] },
 
         })
-        return await this.server.emit(json['room'], json['message']);
+        return await this.server.emit(json['room'], { message: json['message'], author: user.username});
       }
     }
   }

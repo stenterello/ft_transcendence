@@ -490,7 +490,7 @@ let ChatGateway = class ChatGateway {
                     yield this.prisma.chat.create({
                         data: { room: json['room'], author: user.username, message: json['message'] },
                     });
-                    return yield this.server.emit(json['room'], json['message']);
+                    return yield this.server.emit(json['room'], { message: json['message'], author: user.username });
                 }
             }
         });

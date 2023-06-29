@@ -1,17 +1,23 @@
 <script lang="ts">
-    import { statusChange, socket, roomSelected, userInfo } from "../../data";
+    import { statusChange, socket, roomSelected, userInfo, newMessage } from "../../data";
     import OnlineUsers from "./OnlineUsers.svelte";
+    import RoomManagementBar from "./RoomManagementBar.svelte";
     import RoomManagement from "./RoomManagement.svelte";
+    import Message from "./Message.svelte";
 
     export let  chat: string | null = null;
     let         roomManagement: boolean = false;
     let         optionChange: boolean = false;
+    let         messages: Array<Object> = [];
+    let         newMessages: boolean = false;
 
-    async function  getMessages(): Promise<Object> {
+    async function  getMessages(): Promise<void> {
         const   res: Response = await fetch('http://localhost:3000/chat/' + chat);
-        const   json: Object = await res.json();
-
-        return json;
+        const   json: Array<Object> = await res.json();
+        console.log(json);
+        for (let i = 0; i < json.length; i++) {
+            messages.push(json[i]);
+        }
     }
 
     async function  getRoomObject(): Promise<Object> {
@@ -23,56 +29,23 @@
         }
     }
 
-    function    leaveRoom(): void {
-        $socket.emit('leaveRoom', JSON.stringify({'room': $roomSelected}))
-        $roomSelected = undefined;
-    }
+    function	scrollDown(): void {
+        if (document.getElementById('message-list-active') === null)
+            return ;
+		const	messages: HTMLCollection = document.getElementById('message-list-active').children;
+		const	lastMessage: Element = messages[messages.length - 1];
+        if (lastMessage !== undefined && lastMessage.nodeName !== "P")
+    		lastMessage.scrollIntoView(false);
+		else setTimeout(scrollDown, 200);
+	}
 
-    function    deleteRoom(): void {
-        $socket.emit('deleteRoom', JSON.stringify({'room': $roomSelected}))
-        $roomSelected = undefined;
-    }
+    $socket.on(chat, (data: Object) => {
+        messages.push(data);
+        newMessages = (newMessages) ? false : true;
+        setTimeout(scrollDown, 50);
+    });
 
-    function    demoteAdmin(user: string): void {
-        $socket.emit('demoteAdmin', JSON.stringify({'user': user, 'room': $roomSelected}));
-        optionChange = (optionChange) ? false : true;
-    }
 
-    function    promoteAdmin(user: string): void {
-        $socket.emit('promoteAdmin', JSON.stringify({'user': user, 'room': $roomSelected}));
-        optionChange = (optionChange) ? false : true;
-    }
-
-    function    kickUser(user: string): void {
-        $socket.emit('kickUser', JSON.stringify({'user': user, 'room': $roomSelected}));
-        optionChange = (optionChange) ? false : true;
-    }
-
-    function    banUser(user: string): void {
-        $socket.emit('banUser', JSON.stringify({'user': user, 'room': $roomSelected}));
-        optionChange = (optionChange) ? false : true;
-    }
-
-    function    unbanUser(user: string): void {
-        $socket.emit('banUser', JSON.stringify({'user': user, 'room': $roomSelected}));
-        optionChange = (optionChange) ? false : true;
-    }
-
-    function    muteUser(user: string): void {
-        $socket.emit('mute', JSON.stringify({'user': user, 'room': $roomSelected}));
-        optionChange = (optionChange) ? false : true;
-    }
-
-    function    unmuteUser(user: string): void {
-        $socket.emit('unmute', JSON.stringify({'user': user, 'room': $roomSelected}));
-        optionChange = (optionChange) ? false : true;
-    }
-
-    function    changePassword(): void {
-        let newPassword: string = prompt('What\'s the new password?');
-        $socket.emit('changePwd', JSON.stringify({'room': $roomSelected, 'password': newPassword}));
-        optionChange = (optionChange) ? false : true;
-    }
 
 </script>
 
@@ -86,67 +59,28 @@
             {/key}
             {#await getMessages()}
                 <p>loading</p>
-            {:then messages}
+            {:then}
                 <div id="messages">
-                    <RoomManagement {roomInfo} on:options={ () => {roomManagement = (roomManagement) ? false : true;} } />
+                    <RoomManagementBar {roomInfo} on:options={ () => {roomManagement = (roomManagement) ? false : true;} } />
                     {#if roomManagement === false}
-                        {#if Object.values(messages).length > 0}
-                            <ul>
-
+                        {#if messages !== undefined && Object.values(messages).length > 0}
+                            <ul id="message-list-active" style="overflow: auto">
+                                {#key newMessages}
+                                    {#each messages as message}
+                                        <Message privateMessage={message} on:message />
+                                    {/each}
+                                {/key}
                             </ul>
                         {:else}
                             <p>still no messages</p>
                         {/if}
                     {:else}
                         {#key optionChange}
-                            {#if roomInfo['admins'].includes($userInfo['username']) === false}
-                                <button on:click|preventDefault={leaveRoom}>Leave room</button>
-                            {:else}
-                                {#if roomInfo['password'] !== null}
-                                    <button on:click|preventDefault={changePassword}>Change password</button>
-                                {/if}
-                                <button on:click|preventDefault={deleteRoom}>Delete room</button>
-                                <h4>Members management</h4>
-                                <ul class="member-options">
-                                    {#each roomInfo['members'] as member}
-                                        {#if member !== $userInfo['username']}
-                                            {#if roomInfo['admins'].includes(member)}
-                                                <li>
-                                                    <p>{member}</p>
-                                                    <div>
-                                                        <button on:click|preventDefault={() => demoteAdmin(member) }>Demote admin</button>
-                                                    </div>
-                                                </li>
-                                            {:else}
-                                                <li>
-                                                    <p>{member}</p>
-                                                    <div>
-                                                        <button on:click|preventDefault={() => kickUser(member) }>Kick user</button>
-                                                        <button on:click|preventDefault={() => banUser(member) }>Ban user</button>
-                                                        {#if roomInfo['mutelist'].includes(member) === false}
-                                                            <button on:click|preventDefault={() => muteUser(member) }>Mute user</button>
-                                                            <button on:click|preventDefault={() => promoteAdmin(member) }>Promote to admin</button>
-                                                        {:else}
-                                                            <button on:click|preventDefault={() => unmuteUser(member) }>Unmute user</button>
-                                                        {/if}
-                                                    </div>
-                                                </li>
-                                            {/if}
-                                        {/if}
-                                    {/each}
-                                </ul>
-                                <h4>Banned users</h4>
-                                <ul class="member-options">
-                                    {#each roomInfo['banlist'] as banned}
-                                    <li>
-                                        <p>{banned}</p>
-                                        <div>
-                                            <button on:click|preventDefault={() => unbanUser(banned) }>Unban user</button>
-                                        </div>
-                                    </li>
-                                    {/each}
-                                </ul>
-                            {/if}
+                            {#await getRoomObject()}
+                                <p>refreshing</p>
+                            {:then roomInfo} 
+                                <RoomManagement {roomInfo} on:optionChange={() => {optionChange = (optionChange) ? false : true} }/>
+                            {/await}
                         {/key}
                     {/if}
                 </div>
@@ -172,11 +106,8 @@
     }
     ul {
         margin: 0;
-        height: 90%;
+        height: 84%;
         padding: 0;
     }
-    .member-options > li {
-        display: flex;
-        justify-content: space-between;
-    }
+    
 </style>
