@@ -2,9 +2,7 @@ TESTING:
     - AUTH / LOGIN
         . register -> working
         . login -> working
-        . two-factor -> working BUT : when disabling twofa, frontend displays new qr code ---
-                                        it's a problem for backend too, because Google Authenticator creates new code for same user@email
-                                        and the correct one is the latest
+        . two-factor -> working
         . cookie -> working
         . oauth -> working
 

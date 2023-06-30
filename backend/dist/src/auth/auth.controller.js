@@ -27,7 +27,6 @@ const auth_service_1 = require("./auth.service");
 const local_auth_guard_1 = require("./local-auth.guard");
 const jwt_auth_guard_1 = require("../jwt/jwt-auth.guard");
 const user_service_1 = require("../user/user.service");
-const jwt_2fa_auth_guard_1 = require("../jwt/jwt-2fa-auth.guard");
 let AuthController = class AuthController {
     constructor(authService, userService) {
         this.authService = authService;
@@ -71,7 +70,6 @@ let AuthController = class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             const name = body.get('username');
             const twofa = body.get('twoFactorAuthenticationCode');
-            console.log('entrato');
             if (name && twofa) {
                 const user = yield this.userService.findByName(name);
                 const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(twofa, user);
@@ -127,7 +125,8 @@ __decorate([
 ], AuthController.prototype, "toggleTwoFactorAuthentication", null);
 __decorate([
     (0, common_1.Post)('2fa/authenticate'),
-    (0, common_1.UseGuards)(jwt_2fa_auth_guard_1.Jwt2faAuthGuard),
+    (0, common_1.HttpCode)(200),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
