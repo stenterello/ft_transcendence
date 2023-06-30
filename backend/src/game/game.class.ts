@@ -10,7 +10,7 @@ export class Game {
     private ballCordY: number = 50;
     private ballDirX: number;
     private ballDirY: number;
-    private speed: number = 2;
+    private speed: number = 1;
     private LPY: number = 35;
     private RPY: number = 35;
     private size: number = 30;
@@ -25,7 +25,7 @@ export class Game {
     private interval: any;
     private matchId: number;
     private timer: number = 0;
-    private wallSpeed: number = 2;
+    private wallSpeed: number = 3;
     private spectators: Array<string> = [];
     private isPaused: boolean = false;
     
@@ -64,17 +64,33 @@ export class Game {
 
     public moveUp(sock: string) {
         if (sock === this.P1Sock && this.LPY > 0) {
-            this.LPY -= this.wallSpeed;
+            if (this.LPY < this.wallSpeed) {
+                this.LPY = 0;
+            } else {
+                this.LPY -= this.wallSpeed;
+            }
         } else if (sock === this.P2Sock && this.RPY > 0) {
-            this.RPY -= this.wallSpeed;
+            if (this.RPY < this.wallSpeed) {
+                this.LPY = 0;
+            } else {
+                this.RPY -= this.wallSpeed;
+            }
         }
     }
 
     public moveDown(sock: string) {
         if (sock === this.P1Sock && this.LPY + this.size <= this.canvasHeight) {
-            this.LPY += this.wallSpeed;
+            if (this.LPY + this.size >= this.canvasHeight) {
+                this.LPY = this.canvasHeight - this.size;
+            } else {
+                this.LPY += this.wallSpeed;
+            }
         } else if (sock === this.P2Sock && this.RPY + this.size <= this.canvasHeight) {
-            this.RPY += this.wallSpeed;
+            if (this.RPY + this.size >= this.canvasHeight) {
+                this.RPY = this.canvasHeight - this.size;
+            } else {
+                this.RPY += this.wallSpeed;
+            }
         }
     }
 
@@ -100,7 +116,7 @@ export class Game {
         return new Promise (async (resolve) => {
             this.interval = setInterval(async () => {
                 if (this.isPaused === false) {
-                    if (this.timer == 20) {
+                    if (this.timer == 40) {
                         this.speed += 1;
                         this.timer = 0;
                     }
@@ -128,7 +144,7 @@ export class Game {
                         return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
                     }
                 }
-            }, 70);
+            }, 50);
         })
     }
 
