@@ -7,13 +7,13 @@ export declare class GameController {
     constructor(gameService: GameService, gameGateway: GameGateway);
     findAll(): Promise<Matches[]>;
     getUserHistory(user: string): Promise<{
-        score: string;
         player1: string;
         player2: string;
+        score: string;
     }[]>;
     getUserOfficialHistory(user: string): Promise<{
-        score: string;
         player1: string;
         player2: string;
+        score: string;
     }[]>;
 }

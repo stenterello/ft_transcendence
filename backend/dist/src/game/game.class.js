@@ -17,7 +17,7 @@ class Game {
         this.prisma = prisma;
         this.ballCordX = 50;
         this.ballCordY = 50;
-        this.speed = 2;
+        this.speed = 1;
         this.LPY = 35;
         this.RPY = 35;
         this.size = 30;
@@ -28,7 +28,7 @@ class Game {
         this.P1Sock = "";
         this.P2Sock = "";
         this.timer = 0;
-        this.wallSpeed = 2;
+        this.wallSpeed = 3;
         this.spectators = [];
         this.isPaused = false;
         this.user1 = player1;
@@ -61,18 +61,38 @@ class Game {
     }
     moveUp(sock) {
         if (sock === this.P1Sock && this.LPY > 0) {
-            this.LPY -= this.wallSpeed;
+            if (this.LPY < this.wallSpeed) {
+                this.LPY = 0;
+            }
+            else {
+                this.LPY -= this.wallSpeed;
+            }
         }
         else if (sock === this.P2Sock && this.RPY > 0) {
-            this.RPY -= this.wallSpeed;
+            if (this.RPY < this.wallSpeed) {
+                this.RPY = 0;
+            }
+            else {
+                this.RPY -= this.wallSpeed;
+            }
         }
     }
     moveDown(sock) {
         if (sock === this.P1Sock && this.LPY + this.size <= this.canvasHeight) {
-            this.LPY += this.wallSpeed;
+            if (this.LPY + this.size >= this.canvasHeight) {
+                this.LPY = this.canvasHeight - this.size;
+            }
+            else {
+                this.LPY += this.wallSpeed;
+            }
         }
         else if (sock === this.P2Sock && this.RPY + this.size <= this.canvasHeight) {
-            this.RPY += this.wallSpeed;
+            if (this.RPY + this.size >= this.canvasHeight) {
+                this.RPY = this.canvasHeight - this.size;
+            }
+            else {
+                this.RPY += this.wallSpeed;
+            }
         }
     }
     increaseP1() { return this.P1++; }
@@ -90,6 +110,7 @@ class Game {
             this.RPY = 35;
             this.speed = 2;
             this.wallSpeed = 2;
+            this.timer = 0;
         });
     }
     loopGame(type) {
@@ -97,9 +118,8 @@ class Game {
             return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
                 this.interval = setInterval(() => __awaiter(this, void 0, void 0, function* () {
                     if (this.isPaused === false) {
-                        if (this.timer == 20) {
+                        if (this.timer % 80 == 0) {
                             this.speed += 1;
-                            this.timer = 0;
                         }
                         this.timer++;
                         this.ballCordX += (this.ballDirX * this.speed);
@@ -127,7 +147,7 @@ class Game {
                             return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
                         }
                     }
-                }), 70);
+                }), 80);
             }));
         });
     }

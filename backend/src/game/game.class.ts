@@ -71,7 +71,7 @@ export class Game {
             }
         } else if (sock === this.P2Sock && this.RPY > 0) {
             if (this.RPY < this.wallSpeed) {
-                this.LPY = 0;
+                this.RPY = 0;
             } else {
                 this.RPY -= this.wallSpeed;
             }
@@ -110,15 +110,15 @@ export class Game {
         this.RPY = 35;
         this.speed = 2;
         this.wallSpeed = 2;
+        this.timer = 0;
     }
 
     public async loopGame(type: string) {
         return new Promise (async (resolve) => {
             this.interval = setInterval(async () => {
                 if (this.isPaused === false) {
-                    if (this.timer == 40) {
+                    if (this.timer % 80 == 0) {
                         this.speed += 1;
-                        this.timer = 0;
                     }
                     this.timer++;
                     this.ballCordX += (this.ballDirX * this.speed);
@@ -144,7 +144,7 @@ export class Game {
                         return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
                     }
                 }
-            }, 50);
+            }, 80);
         })
     }
 
