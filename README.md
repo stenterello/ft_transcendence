@@ -4,7 +4,7 @@ This repository houses our ongoing collaboration on the ft_transcendence project
 
 ## Description
 
-The ft_transcendence project is a multiplayer online gaming platform inspired by the classic game Pong. Our goal is to build a fully functional and visually appealing web app that allows users to engage in thrilling Pong matches with a twist. The project is divided into different components, with each component being developed by one or more contributors.
+The ft_transcendence project is a multiplayer online gaming platform inspired by the classic game Pong. Our goal is to build a fully functional and visually appealing web app that allows users to engage in thrilling Pong matches with a twist. The project is divided into different components.
 
 ### Frontend
 

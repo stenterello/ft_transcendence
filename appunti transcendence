@@ -9,10 +9,10 @@ TESTING:
     - CHAT
         . general messages -> working
         . general buttons -> working (except invite to play)
-        . private messages not displayed if not open chat
+        . private messages -> working
 
         // Rooms
-            . Errore nel leaveRoom di una protected room -> il backend dà questo errore (anche se l'utente è effettivamente cancellato dal campo members)
+            . Errore nel leaveRoom o joinRoom di una protected room -> il backend dà questo errore (anche se l'utente è effettivamente cancellato dal campo members)
             {
                 backend     | [Nest] 158  - 06/28/2023, 2:10:35 PM   ERROR [WsExceptionsHandler] data and hash arguments required
                 backend     | Error: data and hash arguments required
@@ -28,7 +28,7 @@ TESTING:
 
     - USER ACCOUNT
         . friend request -> working
-        . notification -> working and dismissing correctly
+        . notification -> working
         . block / unblock -> working
         . settings -> all working
 

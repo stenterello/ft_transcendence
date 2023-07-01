@@ -48,7 +48,7 @@
 		else {
 			if (document.getElementById('room-creation-err') !== null)
 				document.getElementById('room-creation-err').remove();
-			dispatch('roomChange', null);
+			dispatch('reloadRooms', null);
 		}
 	}
 

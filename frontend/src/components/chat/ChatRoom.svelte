@@ -1,15 +1,17 @@
 <script lang="ts">
-    import { statusChange, socket, roomSelected, userInfo, newMessage } from "../../data";
+    import { statusChange, socket } from "../../data";
     import OnlineUsers from "./OnlineUsers.svelte";
     import RoomManagementBar from "./RoomManagementBar.svelte";
     import RoomManagement from "./RoomManagement.svelte";
     import Message from "./Message.svelte";
+    import { createEventDispatcher } from 'svelte';
 
     export let  chat: string | null = null;
     let         roomManagement: boolean = false;
     let         optionChange: boolean = false;
     let         messages: Array<Object> = [];
     let         newMessages: boolean = false;
+    const       dispatch = createEventDispatcher();
 
     async function  getMessages(): Promise<void> {
         const   res: Response = await fetch('http://localhost:3000/chat/' + chat);
@@ -79,7 +81,7 @@
                             {#await getRoomObject()}
                                 <p>refreshing</p>
                             {:then roomInfo} 
-                                <RoomManagement {roomInfo} on:optionChange={() => {optionChange = (optionChange) ? false : true} }/>
+                                <RoomManagement {roomInfo} on:optionChange={() => {optionChange = (optionChange) ? false : true; dispatch('reloadRooms', null);} }/>
                             {/await}
                         {/key}
                     {/if}

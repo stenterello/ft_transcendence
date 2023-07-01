@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	import { userInfo, statusChange, socket, events } from "../../data";
+	import { userInfo, statusChange, socket } from "../../data";
 	import { createEventDispatcher, onMount } from "svelte";
 	import { getStatus } from "./interactionUtils.svelte";
     import ChatSettings from "./ChatSettings.svelte";

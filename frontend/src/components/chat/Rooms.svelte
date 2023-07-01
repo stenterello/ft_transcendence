@@ -5,14 +5,11 @@
     import RoomCreation from "./RoomCreation.svelte";
 
 	let			roomOptions: boolean = false;
-	let     	toDelete: boolean = false;
-  	let     	owningRooms: Array<string> = [];
 	let			ownedRooms: Array<Object> = [];
 	let			otherRooms: Array<Object> = [];
 	let			rooms: Array<Object> = [];
-	let			chat: string | null = null;
 	let			roomInfo: Object | null = null;
-	let			roomChange: boolean = false;
+	let			reloadRooms: boolean = false;
 	let			room: string = undefined;
 
 	async function	getRooms(): Promise<void> {
@@ -44,7 +41,8 @@
 
 	async function	chooseRoom(event): Promise<void> {
 		roomInfo = rooms.find(elem => elem['name'] === event.target.innerHTML);
-		if (roomInfo['password'] !== null && room === undefined && roomInfo['members'].includes($userInfo['username']) === false)
+		console.log(roomInfo);
+		if (roomInfo['password'] !== null && roomInfo['members'].includes($userInfo['username']) === false)
 		{
 			room = event.target.innerHTML;
 			document.getElementById('insert-password').style.visibility = 'visible';
@@ -57,10 +55,9 @@
 	}
 
 	async function	tryPassword(room: string, password: string): Promise<void> {
-		
 		const bool = await roomInfo['members'].includes($userInfo['username']);
 		if (bool === false) {
-			$socket.emit('joinRoom', JSON.stringify({'room': room, 'password': password}), (res) => {
+			$socket.emit('joinRoom', JSON.stringify({'room': room, 'password': password}), (res: boolean) => {
 				if (res === false) {
 					if (document.getElementById('insert-password-err') === null) {
 						const	err: HTMLElement = document.createElement('span');
@@ -74,6 +71,9 @@
 				}
 				else {
 					$roomSelected = room;
+					if (document.getElementById('insert-password-err') !== null) {
+						document.getElementById('insert-password-err').remove();
+					}
 				}
 			});
 		}
@@ -88,7 +88,7 @@
 
 </script>
 
-{#key roomChange}
+{#key reloadRooms}
 	{#await getRooms()}
 		<p>loading rooms</p>
 	{:then} 
@@ -115,7 +115,7 @@
 					</ul>
 				{/if}
 				<form on:submit|preventDefault={() => tryPassword(room, document.getElementById('room-password').value)} id="insert-password" style="padding-top: 10px;">
-					<button on:click={() => { document.getElementById('insert-password').style.visibility = 'hidden'; }} style="position: absolute; background-color: black; width: 4%; height: 11%; border-radius: 1vw; top: 10px; right: 20px; padding: 0; background: url('cross.png') no-repeat; background-size: cover; background-color: white;"></button>
+					<button on:click|preventDefault={() => { document.getElementById('insert-password').style.visibility = 'hidden'; }} style="position: absolute; background-color: black; width: 4%; height: 11%; border-radius: 1vw; top: 10px; right: 20px; padding: 0; background: url('cross.png') no-repeat; background-size: cover; background-color: white;"></button>
 					<p>This chat room is protected.</p>
 					<p>Insert password</p>
 					<input id="room-password" type="password" required>
@@ -133,12 +133,12 @@
 
 {#if roomOptions === true}
 	<RoomCreation 
-		on:roomOptions={() => {roomOptions = (roomOptions === true) ? false : true} } 
-		on:roomChange={() => { roomOptions = false; roomChange = (roomChange) ? false : true; } }  />
+		on:roomOptions={() => { roomOptions = (roomOptions === true) ? false : true } } 
+		on:reloadRooms={() => { roomOptions = false; reloadRooms = (reloadRooms) ? false : true; } } />
 {/if}
 
 {#key $roomSelected}
-	<ChatRoom chat={$roomSelected} on:message />
+	<ChatRoom chat={$roomSelected} on:message on:reloadRooms={() => { roomOptions = false; reloadRooms = (reloadRooms) ? false : true; } }  />
 {/key}
 
 <style>

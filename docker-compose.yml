@@ -19,7 +19,7 @@ services:
       - nestjs-network
     volumes:
       - ./frontend:/usr/src/frontend
-    restart: always
+    restart: on-failure
 
   backend:
     container_name: backend
@@ -42,7 +42,7 @@ services:
     volumes:
       - ./backend:/usr/src/backend
       - /usr/src/backend/node_modules
-    restart: always
+    restart: on-failure
 
   postgres:
     image: postgres:alpine
@@ -58,7 +58,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: "${POSTGRES_DB_PREFIX}_${POSTGRES_DB_NAME}"
       PG_DATA: /var/lib/postgresql/data
-    restart: always
+    restart: on-failure
 
 networks:
   frontend:

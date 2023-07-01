@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { newMessage, onlineUsers, statusChange, userInfo, userSelected } from "../../data";
+    import { newMessage, onlineUsers, statusChange, userInfo, userSelected, socket, bearer } from "../../data";
 	import { createEventDispatcher } from "svelte";
     import OnlineUsersPrivateMessages from "./OnlineUsersPrivateMessages.svelte";
 	import PrivateChat from "./PrivateChat.svelte";
@@ -17,6 +17,15 @@
 		return (ret);
 	}
 
+	$socket.on('private message', () => { $newMessage = ($newMessage) ? false : true; });
+
+	async function	updateUserInfo(): Promise<void> {
+		const	response: Response = await fetch('http://localhost:3000/users/' + $userInfo['username'] + '-token');
+		const	json: Object = await response.json();
+		$userInfo = json;
+		if ($bearer.length > 0)
+			$userInfo['bearer'] = $bearer;
+	}
 
 </script>
 
@@ -33,25 +42,29 @@
 </div>
 
 {#key $newMessage}
-	{#key $userSelected}
-		{#if $userSelected !== undefined}
-			<PrivateChat user={$userSelected} on:unselect={ () => { dispatch('select-change', { user: undefined }); $userSelected = undefined; }} />
-		{:else if $userInfo['privateConv'].length > 0}
-			<div id="message-history">
-				<ul>
-				{#each $userInfo['privateConv'] as conversation}
-					{#await retrieveOtherUserInfoByName(conversation)}
-						<p>loading</p>
-					{:then user}
-						<MessagesButton {user} on:select-change />
-					{/await}
-				{/each}
-				</ul>
-			</div>
-		{:else}
-			<p>no private messages in your history</p>
-		{/if}
-	{/key}
+	{#await updateUserInfo()}
+		<p>loading</p>
+	{:then}		
+		{#key $userSelected}
+			{#if $userSelected !== undefined}
+				<PrivateChat user={$userSelected} on:unselect={ () => { dispatch('select-change', { user: undefined }); $userSelected = undefined; }} />
+			{:else if $userInfo['privateConv'].length > 0}
+				<div id="message-history">
+					<ul>
+					{#each $userInfo['privateConv'] as conversation}
+						{#await retrieveOtherUserInfoByName(conversation)}
+							<p>loading</p>
+						{:then user}
+							<MessagesButton {user} on:select-change />
+						{/await}
+					{/each}
+					</ul>
+				</div>
+			{:else}
+				<p>no private messages in your history</p>
+			{/if}
+		{/key}
+	{/await}
 {/key}
 
 <style>
