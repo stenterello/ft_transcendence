@@ -1,12 +1,11 @@
 <script lang="ts">
 
 	import { createEventDispatcher } from 'svelte';
-	import { chat, socket, userInfo, bearer, userSelected, roomSelected } from '../../data';
+	import { chat, socket, userInfo, bearer, userSelected, roomSelected, chatTab } from '../../data';
 	import GeneralChat from './GeneralChat.svelte';
 	import Rooms from './Rooms.svelte';
 	import PrivateMessages from './PrivateMessages.svelte';
 
-	let			tab: number = 0;
 	let			height: string = ($chat) ? '90vh' : '0';
 
 	const	dispatch = createEventDispatcher();
@@ -26,13 +25,14 @@
 			setTimeout(clear, 10);
 			return ;
 		}
-		switch (+tab) {
+		switch (+$chatTab) {
 			case 0: {
 				$socket.emit('general', messages); break ;
 			}
 			case 1: {
 				$socket.emit('sendToRoom', JSON.stringify({'room': $roomSelected, 'message': messages}));
 				console.log( JSON.stringify({'room': $roomSelected, 'message': messages}));
+				console.log('ei')
 				break ;
 			}
 			case 2: {
@@ -81,15 +81,15 @@
 	{/if}
 	<div id="chat-window" style="height: {height}">
 		<div id="menu">
-			<button on:click={() => { tab = 0; $userSelected = undefined; $roomSelected = undefined; } } style="color: #d61a1f;">general chat</button>
-			<button on:click={() => { tab = 1; $userSelected = undefined; $roomSelected = undefined; } } style="color: white;">rooms</button>
-			<button on:click={() => tab = 2} style="color: #fcd612;">private messages</button>
+			<button on:click={() => { $chatTab = 0; $userSelected = undefined; $roomSelected = undefined; } } style="color: #d61a1f;">general chat</button>
+			<button on:click={() => { $chatTab = 1; $userSelected = undefined; $roomSelected = undefined; } } style="color: white;">rooms</button>
+			<button on:click={() => $chatTab = 2} style="color: #fcd612;">private messages</button>
 		</div>
-		{#if tab === 0}
+		{#if $chatTab === 0}
 			<GeneralChat on:message />
-		{:else if tab === 1}
+		{:else if $chatTab === 1}
 			<Rooms on:message />
-		{:else if tab === 2}
+		{:else if $chatTab === 2}
 			<PrivateMessages on:select-change={setUserSelected} />
 		{/if}
 		<div id="user-input">

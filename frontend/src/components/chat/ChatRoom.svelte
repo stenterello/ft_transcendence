@@ -1,12 +1,11 @@
 <script lang="ts">
-    import { statusChange, socket } from "../../data";
+    import { statusChange, socket, roomSelected } from "../../data";
     import OnlineUsers from "./OnlineUsers.svelte";
     import RoomManagementBar from "./RoomManagementBar.svelte";
     import RoomManagement from "./RoomManagement.svelte";
     import Message from "./Message.svelte";
     import { createEventDispatcher } from 'svelte';
 
-    export let  chat: string | null = null;
     let         roomManagement: boolean = false;
     let         optionChange: boolean = false;
     let         messages: Array<Object> = [];
@@ -14,7 +13,7 @@
     const       dispatch = createEventDispatcher();
 
     async function  getMessages(): Promise<void> {
-        const   res: Response = await fetch('http://localhost:3000/chat/' + chat);
+        const   res: Response = await fetch('http://localhost:3000/chat/' + $roomSelected);
         const   json: Array<Object> = await res.json();
         console.log(json);
         for (let i = 0; i < json.length; i++) {
@@ -26,7 +25,7 @@
         const   res: Response = await fetch('http://localhost:3000/chat/rooms');
         const   json: Object = await res.json();
         for (let i = 0; i < Object.values(json).length; i++) {
-            if (json[i]['name'] === chat)
+            if (json[i]['name'] === $roomSelected)
                 return json[i];
         }
     }
@@ -41,13 +40,12 @@
 		else setTimeout(scrollDown, 200);
 	}
 
-    $socket.on(chat, (data: Object) => {
+    $socket.on($roomSelected, (data: Object) => {
         messages.push(data);
         newMessages = (newMessages) ? false : true;
         setTimeout(scrollDown, 50);
     });
-
-
+    console.log($roomSelected);
 
 </script>
 
@@ -55,7 +53,7 @@
     <p>loading</p>
 {:then roomInfo} 
     <section id="chat-space">
-        {#if chat !== null}
+        {#if $roomSelected !== undefined}
             {#key $statusChange}
                 <OnlineUsers users={roomInfo['members']} --height="25%" on:message />
             {/key}
@@ -74,7 +72,17 @@
                                 {/key}
                             </ul>
                         {:else}
-                            <p>still no messages</p>
+                            {#key newMessages}
+                                {#if messages !== undefined && Object.values(messages).length > 0}
+                                    <ul id="message-list-active" style="overflow: auto">
+                                        {#each messages as message}
+                                            <Message privateMessage={message} on:message />
+                                        {/each}
+                                    </ul>
+                                {:else}
+                                    <p>still no messages</p>
+                                {/if}
+                            {/key}
                         {/if}
                     {:else}
                         {#key optionChange}

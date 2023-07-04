@@ -11,7 +11,6 @@
 
 	$page_shown = window.location.pathname + window.location.search;
 	$webAppIP = window.location.host.split(':')[0];
-	console.log('aoh '+ $webAppIP)
 
 	window.addEventListener("popstate", e => {
 		$userInfo = retrieveInfo();
@@ -20,15 +19,9 @@
 
 	function	show_page(event): void {
 		if ($userInfo === undefined && event.detail.userInfo === undefined)
-		{
 			retrieveInfo();
-		}
 		if (event.detail.userInfo !== undefined)
-		{
-			console.log('qua')
 			$userInfo = event.detail.userInfo;
-			console.log($userInfo['username']);
-		}
 		if (event.detail.bearer !== undefined && $userInfo !== undefined)
 			$userInfo['access_token'] = event.detail.bearer;
 		history.pushState({"href_to_show": event.detail.path}, "", event.detail.path);
@@ -123,7 +116,7 @@
 	}
 
 	async function	retrieveInfo(): Promise<void> {
-		let cookie: string = getCookie('transcendence_session');
+		let		cookie: string = getCookie('transcendence_session');
 		const	b:	boolean = await isCookieValid(cookie);
 		if ($page_shown === "/2faToken")
 			return ;
@@ -135,10 +128,8 @@
 			$page_shown = "/profile";
 		}
 		cookie = getCookie('transcendence_session');
-		if ($page_shown === "/register" || (window.location.search !== "" && $page_shown.startsWith("/profile?user=") === false))
-		{
+		if ($page_shown === "/register" || (window.location.search !== "" && $page_shown.startsWith("/profile?user=") === false && $page_shown !== "/profile"))
 			return null;
-		}
 		if (cookie.length === 0 && $page_shown !== "/2faToken")
 		{
 			resetHome();

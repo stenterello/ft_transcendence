@@ -28,7 +28,7 @@
 		return response;
 	}
 
-	export async function	receiveBearer(userInfo: Object, bearer: string): Promise<boolean> {
+	export async function	receiveBearer(userInfo: Object): Promise<boolean> {
 		const	username: string = document.getElementById('username').value;
 		if (username !== userInfo['username'])
 		{
@@ -62,7 +62,6 @@
 		}
 		const	json: Object = await res.json();
 		userInfo['access_token'] = json['access_token'];
-		bearer = json['access_token'];
 		return true;
 	}
 </script>

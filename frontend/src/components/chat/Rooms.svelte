@@ -41,7 +41,6 @@
 
 	async function	chooseRoom(event): Promise<void> {
 		roomInfo = rooms.find(elem => elem['name'] === event.target.innerHTML);
-		console.log(roomInfo);
 		if (roomInfo['password'] !== null && roomInfo['members'].includes($userInfo['username']) === false)
 		{
 			room = event.target.innerHTML;
@@ -138,7 +137,7 @@
 {/if}
 
 {#key $roomSelected}
-	<ChatRoom chat={$roomSelected} on:message on:reloadRooms={() => { roomOptions = false; reloadRooms = (reloadRooms) ? false : true; } }  />
+	<ChatRoom on:message on:reloadRooms={() => { roomOptions = false; reloadRooms = (reloadRooms) ? false : true; } }  />
 {/key}
 
 <style>

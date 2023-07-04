@@ -19,3 +19,4 @@ export let	newMessage: Writable<boolean> = writable(false);
 export let	opponent: Writable<string> = writable(undefined);
 export let	pos: Writable<string> = writable(undefined);
 export let	webAppIP: Writable<string> = writable('localhost:5173');
+export let	chatTab: Writable<number> = writable(0);

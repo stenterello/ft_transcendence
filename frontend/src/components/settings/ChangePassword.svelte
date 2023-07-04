@@ -61,8 +61,11 @@
 			},
 			body: JSON.stringify(obj)
 		})
-		if (response.ok)
-			dispatch('message', { path: "/profile" });
+		if (response.ok) {
+			$bearer = $userInfo['access_token'];
+			dispatch('message', { path: "/profile", bearer: $userInfo['access_token'] });
+			return ;
+		}
 		else
 		{
 			if (document.getElementById('error') === null)
@@ -104,7 +107,7 @@
 				<form>
 					<input id="username" type="text" name="username" placeholder="Enter username" required>
 					<input id="password" type="password" name="password" placeholder="Enter password" required>
-					<input on:click|preventDefault={async () => { hasBearer = await receiveBearer($userInfo, $bearer) } } type="submit">
+					<input on:click|preventDefault={async () => { hasBearer = await receiveBearer($userInfo) } } type="submit">
 				</form>
 			</div>
 		{:else}
@@ -163,32 +166,11 @@
 		border: none;
 		border-bottom: 3px solid white;
 		cursor: pointer;
+		color: white;
 	}
 
 	label, input[type=submit] {
 		font-family: 'TrashHand';
 	}
-
-	/* #new-form > input {
-		/* font-size: 3em; 
-		padding: 10px 20px;
-		background-color: black;
-		border: none;
-		border-bottom: 3px solid white;
-		cursor: pointer;
-	} */
-
-	/*
-	input[type=submit] {
-		position: absolute;
-		bottom: 9vh;
-		left: 38vw;
-		font-size: 3em;
-		padding: 10px 20px;
-		background-color: black;
-		border: none;
-		border-bottom: 3px solid white;
-		cursor: pointer;
-	} */
 
 </style>
