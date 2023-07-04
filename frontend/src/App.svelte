@@ -10,7 +10,8 @@
 	import io from 'socket.io-client';
 
 	$page_shown = window.location.pathname + window.location.search;
-	$webAppIP = window.location.host;
+	$webAppIP = window.location.host.split(':')[0];
+	console.log('aoh '+ $webAppIP)
 
 	window.addEventListener("popstate", e => {
 		$userInfo = retrieveInfo();
