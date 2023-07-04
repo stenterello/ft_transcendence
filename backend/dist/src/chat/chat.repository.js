@@ -123,6 +123,7 @@ let ChatRepository = class ChatRepository {
                     throw new common_1.BadRequestException("user not found");
                 }
                 arr.splice(index, 1);
+                console.log(arr);
                 return yield this.prisma.rooms.update({
                     where: { name: room },
                     data: {

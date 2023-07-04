@@ -25,6 +25,8 @@ TESTING:
             . se, nel form di creazione della room, si preme invio invece di cliccare su submit, la creazione non ha luogo,
                 per come la vedo si può ignorare il problema. Fammi sapere che ne pensi
 
+            . aggiungere il controllo che quando aggiunge l'utente tra i members, l'utente non sia già presente (modo più facile di risolvere un problema)
+
 
     - USER ACCOUNT
         . friend request -> working

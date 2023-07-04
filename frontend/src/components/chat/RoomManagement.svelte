@@ -8,11 +8,13 @@
 	function    leaveRoom(): void {
         $socket.emit('leaveRoom', JSON.stringify({'room': $roomSelected}))
         $roomSelected = undefined;
+		dispatch('reloadRooms', null);
     }
 
     function    deleteRoom(): void {
         $socket.emit('deleteRoom', JSON.stringify({'room': $roomSelected}))
         $roomSelected = undefined;
+		dispatch('reloadRooms', null);
     }
 
     function    demoteAdmin(user: string): void {
@@ -28,6 +30,7 @@
     function    kickUser(user: string): void {
         $socket.emit('kickUser', JSON.stringify({'user': user, 'room': $roomSelected}));
         dispatch('optionChange', null);
+		dispatch('reloadRooms', null);
     }
 
     function    banUser(user: string): void {

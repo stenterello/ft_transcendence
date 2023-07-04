@@ -22,12 +22,19 @@
     }
 
     async function  getRoomObject(): Promise<Object> {
+        await mock();
         const   res: Response = await fetch('http://localhost:3000/chat/rooms');
         const   json: Object = await res.json();
         for (let i = 0; i < Object.values(json).length; i++) {
             if (json[i]['name'] === $roomSelected)
+            {
                 return json[i];
+            }
         }
+    }
+
+    function    mock(): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, 100));
     }
 
     function	scrollDown(): void {
@@ -45,59 +52,62 @@
         newMessages = (newMessages) ? false : true;
         setTimeout(scrollDown, 50);
     });
-    console.log($roomSelected);
+
+    $socket.on('kicked', (data: Object) => {
+        if (data['room'] === $roomSelected) {
+            $roomSelected = undefined;
+            optionChange = (optionChange) ? false : true;
+        }
+    })
 
 </script>
 
-{#await getRoomObject()}
-    <p>loading</p>
-{:then roomInfo} 
-    <section id="chat-space">
-        {#if $roomSelected !== undefined}
-            {#key $statusChange}
-                <OnlineUsers users={roomInfo['members']} --height="25%" on:message />
-            {/key}
-            {#await getMessages()}
-                <p>loading</p>
-            {:then}
-                <div id="messages">
-                    <RoomManagementBar {roomInfo} on:options={ () => {roomManagement = (roomManagement) ? false : true;} } />
-                    {#if roomManagement === false}
-                        {#if messages !== undefined && Object.values(messages).length > 0}
-                            <ul id="message-list-active" style="overflow: auto">
-                                {#key newMessages}
-                                    {#each messages as message}
-                                        <Message privateMessage={message} on:message />
-                                    {/each}
-                                {/key}
-                            </ul>
-                        {:else}
-                            {#key newMessages}
-                                {#if messages !== undefined && Object.values(messages).length > 0}
-                                    <ul id="message-list-active" style="overflow: auto">
+{#key optionChange}
+    {#await getRoomObject()}
+        <p>loading</p>
+    {:then roomInfo} 
+        <section id="chat-space">
+            {#if $roomSelected !== undefined}
+                {#key $statusChange}
+                    <OnlineUsers users={roomInfo['members']} --height="25%" on:message />
+                {/key}
+                {#await getMessages()}
+                    <p>loading</p>
+                {:then}
+                    <div id="messages">
+                        <RoomManagementBar {roomInfo} on:options={ () => {roomManagement = (roomManagement) ? false : true;} } />
+                        {#if roomManagement === false}
+                            {#if messages !== undefined && Object.values(messages).length > 0}
+                                <ul id="message-list-active" style="overflow: auto">
+                                    {#key newMessages}
                                         {#each messages as message}
                                             <Message privateMessage={message} on:message />
                                         {/each}
-                                    </ul>
-                                {:else}
-                                    <p>still no messages</p>
-                                {/if}
-                            {/key}
+                                    {/key}
+                                </ul>
+                            {:else}
+                                {#key newMessages}
+                                    {#if messages !== undefined && Object.values(messages).length > 0}
+                                        <ul id="message-list-active" style="overflow: auto">
+                                            {#each messages as message}
+                                                <Message privateMessage={message} on:message />
+                                            {/each}
+                                        </ul>
+                                    {:else}
+                                        <p>still no messages</p>
+                                    {/if}
+                                {/key}
+                            {/if}
+                        {:else}
+                            <RoomManagement {roomInfo} on:optionChange={() => {optionChange = (optionChange) ? false : true; dispatch('reloadRooms', null);} }/>
                         {/if}
-                    {:else}
-                        {#key optionChange}
-                            {#await getRoomObject()}
-                                <p>refreshing</p>
-                            {:then roomInfo} 
-                                <RoomManagement {roomInfo} on:optionChange={() => {optionChange = (optionChange) ? false : true; dispatch('reloadRooms', null);} }/>
-                            {/await}
-                        {/key}
-                    {/if}
-                </div>
-            {/await}
-        {/if}
-    </section>
-{/await}
+                    </div>
+                {/await}
+            {/if}
+        </section>
+    {/await}
+{/key}
+
 
 
 <style>

@@ -375,8 +375,9 @@ let ChatGateway = class ChatGateway {
             const room = yield this.chatRepository.getRooms(json['room']);
             const tokick = yield this.userService.findByName(json['user']);
             if (room && user && room.admins.includes(user.username) && tokick && tokick.socketId) {
-                yield this.server.in(tokick.socketId).socketsLeave(room.name);
                 yield this.chatRepository.removeMember(room.name, tokick.username);
+                this.server.to(tokick.socketId).emit('kicked', { room: room.name });
+                yield this.server.in(tokick.socketId).socketsLeave(room.name);
                 return (tokick.username + " kicked");
             }
             throw new common_1.ForbiddenException("You need to be an admin to perform this action");

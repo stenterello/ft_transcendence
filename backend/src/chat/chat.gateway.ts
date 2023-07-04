@@ -369,8 +369,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     const tokick: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username) && tokick && tokick.socketId) {
-      await this.server.in(tokick.socketId).socketsLeave(room.name);
       await this.chatRepository.removeMember(room.name, tokick.username);
+      this.server.to(tokick.socketId).emit('kicked', {room: room.name});
+      await this.server.in(tokick.socketId).socketsLeave(room.name);
       return (tokick.username + " kicked");
     }
     throw new ForbiddenException("You need to be an admin to perform this action")
