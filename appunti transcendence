@@ -38,3 +38,10 @@ TESTING:
         . private game -> to implement
         . achievement -> to implement
         . leaderboard -> working
+
+
+    - REMOTE RUNNING
+        . quando si esegue la web app su un server esterno rispetto al client di riferimento, modificare nei seguenti punti
+            1. Settings dell'API della 42
+            2. Link "login to ft_transcendence with 42 intra" in Login.svelte
+            3. In caso cambiare il secret in GetToken.svelte 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userInfo, page_shown, chat, bearer, socket, events, onlineUsers, inGameUsers, statusChange, generalMessages, newMessage } from "./data";
+	import { webAppIP, userInfo, page_shown, chat, bearer, socket, events, onlineUsers, inGameUsers, statusChange, generalMessages, newMessage } from "./data";
     import MainPage from "./components/MainPage.svelte";
     import Logged from "./components/Logged.svelte";
     import RegistrationPage from "./components/RegistrationPage.svelte";
@@ -10,6 +10,7 @@
 	import io from 'socket.io-client';
 
 	$page_shown = window.location.pathname + window.location.search;
+	$webAppIP = window.location.host;
 
 	window.addEventListener("popstate", e => {
 		$userInfo = retrieveInfo();

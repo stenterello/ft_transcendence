@@ -19,8 +19,6 @@
 		if (response.ok) {
 			const	json: Object = await response.json();
 			const	bearer: string = json['access_token'];
-			console.log('cookie');
-			console.log(cookie);
 			const	tmpResponse: Response = await fetch('http://localhost:3000/users/' + cookie);
 			const	tmpJson: Object = await tmpResponse.json();
 			if (tmpJson.hasOwnProperty('istwofaEnable') && tmpJson['istwofaEnable'] === true)

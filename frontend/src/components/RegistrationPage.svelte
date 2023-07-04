@@ -3,6 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { setCookie, getCookie } from 'svelte-cookie';
 	import { addDays } from './auth/authenticationUtils.svelte';
+	import { webAppIP } from '../data';
 
 	const	dispatch = createEventDispatcher();
 
@@ -16,7 +17,7 @@
 			['expires', addDays(date, cookieDays).toISOString()]
 		]);
 		const json: Object = Object.fromEntries(map);
-		const response: Response = await fetch('http://localhost:3000/users/create', {
+		const response: Response = await fetch('http://${webAppUI}:3000/users/create', {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
