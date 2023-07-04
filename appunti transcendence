@@ -12,20 +12,12 @@ TESTING:
         . private messages -> working
 
         // Rooms
-            . Errore nel leaveRoom o joinRoom di una protected room -> il backend dà questo errore (anche se l'utente è effettivamente cancellato dal campo members)
-            {
-                backend     | [Nest] 158  - 06/28/2023, 2:10:35 PM   ERROR [WsExceptionsHandler] data and hash arguments required
-                backend     | Error: data and hash arguments required
-                backend     |     at Object.compareSync (/usr/src/backend/node_modules/bcrypt/bcrypt.js:166:15)
-                backend     |     at comparePassword (/usr/src/backend/src/utils/bcrypt.ts:10:19)
-                backend     |     at ChatGateway.<anonymous> (/usr/src/backend/src/chat/chat.gateway.ts:309:29)
-                backend     |     at Generator.next (<anonymous>)
-                backend     |     at fulfilled (/usr/src/backend/dist/src/chat/chat.gateway.js:14:58)
-            }
             . se, nel form di creazione della room, si preme invio invece di cliccare su submit, la creazione non ha luogo,
                 per come la vedo si può ignorare il problema. Fammi sapere che ne pensi
 
             . aggiungere il controllo che quando aggiunge l'utente tra i members, l'utente non sia già presente (modo più facile di risolvere un problema)
+
+            . la funzione ban da backend deve anche togliere l'utente dai members
 
 
     - USER ACCOUNT

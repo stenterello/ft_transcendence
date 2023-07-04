@@ -391,6 +391,7 @@ let ChatGateway = class ChatGateway {
             const toBan = yield this.userService.findByName(json['user']);
             if (room && user && room.admins.includes(user.username) && toBan) {
                 if ((yield this.chatRepository.ban(room.name, toBan.username)) && toBan.socketId) {
+                    this.server.to(toBan.socketId).emit('kicked', { room: room.name });
                     return yield this.server.in(toBan.socketId).socketsLeave(room.name);
                 }
             }
