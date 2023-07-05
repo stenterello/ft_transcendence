@@ -113,7 +113,7 @@
 						{/each}
 					</ul>
 				{/if}
-				<form on:submit|preventDefault={() => tryPassword(room, document.getElementById('room-password').value)} id="insert-password" style="padding-top: 10px;">
+				<form on:submit|preventDefault={() => { tryPassword(room, document.getElementById('room-password').value); document.getElementById('insert-password').style.visibility = 'hidden';}} id="insert-password" style="padding-top: 10px;">
 					<button on:click|preventDefault={() => { document.getElementById('insert-password').style.visibility = 'hidden'; }} style="position: absolute; background-color: black; width: 4%; height: 11%; border-radius: 1vw; top: 10px; right: 20px; padding: 0; background: url('cross.png') no-repeat; background-size: cover; background-color: white;"></button>
 					<p>This chat room is protected.</p>
 					<p>Insert password</p>

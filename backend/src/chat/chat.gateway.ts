@@ -399,6 +399,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     const toMute: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username) && toMute) {
+      if (toMute.socketId)
+        this.server.to(toMute.socketId).emit('muteChange', {room: room.name});
       return await this.chatRepository.mute(room.name, toMute.username);
     }
     throw new ForbiddenException("You need to be an admin to perform this action")
@@ -411,6 +413,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     const toMute: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username) && toMute) {
+      if (toMute.socketId)
+        this.server.to(toMute.socketId).emit('muteChange', {room: room.name});
       return await this.chatRepository.unmute(room.name, toMute.username);
     }
     throw new ForbiddenException("You need to be an admin to perform this action")

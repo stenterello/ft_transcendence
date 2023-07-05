@@ -5,6 +5,7 @@
 	import GeneralChat from './GeneralChat.svelte';
 	import Rooms from './Rooms.svelte';
 	import PrivateMessages from './PrivateMessages.svelte';
+    import { retrieveOtherUserInfo } from './interactionUtils.svelte';
 
 	let			height: string = ($chat) ? '90vh' : '0';
 
@@ -70,6 +71,35 @@
 			elem.style.height = '90vh';
 	}
 
+	async function  getRoomObject(): Promise<Object> {
+        await mock();
+        const   res: Response = await fetch('http://localhost:3000/chat/rooms');
+        const   json: Object = await res.json();
+        for (let i = 0; i < Object.values(json).length; i++) {
+            if (json[i]['name'] === $roomSelected)
+            {
+                return json[i];
+            }
+        }
+    }
+
+	function    mock(): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+	async function isMuted(): Promise<boolean> {
+		if ($roomSelected === undefined)
+			return false;
+		let	roomInfo: Object = await getRoomObject();
+		if (roomInfo['mutelist'].includes($userInfo['username']))
+			return true;
+		return false;
+	}
+
+	let muteChange: boolean = false;
+
+	$socket.on('muteChange', (data) => { if (data['room'] === $roomSelected) muteChange = (muteChange) ? false : true });
+
 </script>
 
 <section id="chat-container">
@@ -83,7 +113,7 @@
 		<div id="menu">
 			<button on:click={() => { $chatTab = 0; $userSelected = undefined; $roomSelected = undefined; } } style="color: #d61a1f;">general chat</button>
 			<button on:click={() => { $chatTab = 1; $userSelected = undefined; $roomSelected = undefined; } } style="color: white;">rooms</button>
-			<button on:click={() => $chatTab = 2} style="color: #fcd612;">private messages</button>
+			<button on:click={() => { $chatTab = 2; $userSelected = undefined; $roomSelected = undefined; } } style="color: #fcd612;">private messages</button>
 		</div>
 		{#if $chatTab === 0}
 			<GeneralChat on:message />
@@ -93,8 +123,19 @@
 			<PrivateMessages on:select-change={setUserSelected} />
 		{/if}
 		<div id="user-input">
-			<textarea on:keydown={checkAndSendMessage} id="user-text" name="user-text" placeholder="write your message..."></textarea>
-			<button on:click={sendMessage} id="send">send</button>
+			{#key muteChange}
+				{#await isMuted()}
+					<textarea on:keydown={checkAndSendMessage} id="user-text" name="user-text" placeholder="write your message..."></textarea>
+					<button on:click={sendMessage} id="send">send</button>
+				{:then isMuted} 
+					{#if isMuted}
+						<p>You are muted</p>
+					{:else}
+						<textarea on:keydown={checkAndSendMessage} id="user-text" name="user-text" placeholder="write your message..."></textarea>
+						<button on:click={sendMessage} id="send">send</button>
+					{/if}
+				{/await}
+			{/key}
 		</div>
 	</div>
 </section>

@@ -405,6 +405,8 @@ let ChatGateway = class ChatGateway {
             const room = yield this.chatRepository.getRooms(json['room']);
             const toMute = yield this.userService.findByName(json['user']);
             if (room && user && room.admins.includes(user.username) && toMute) {
+                if (toMute.socketId)
+                    this.server.to(toMute.socketId).emit('muteChange', { room: room.name });
                 return yield this.chatRepository.mute(room.name, toMute.username);
             }
             throw new common_1.ForbiddenException("You need to be an admin to perform this action");
@@ -417,6 +419,8 @@ let ChatGateway = class ChatGateway {
             const room = yield this.chatRepository.getRooms(json['room']);
             const toMute = yield this.userService.findByName(json['user']);
             if (room && user && room.admins.includes(user.username) && toMute) {
+                if (toMute.socketId)
+                    this.server.to(toMute.socketId).emit('muteChange', { room: room.name });
                 return yield this.chatRepository.unmute(room.name, toMute.username);
             }
             throw new common_1.ForbiddenException("You need to be an admin to perform this action");
