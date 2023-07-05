@@ -129,7 +129,8 @@ let ChatService = class ChatService {
                 }
             });
             if (targetRoom === null || targetRoom === void 0 ? void 0 : targetRoom.admins.includes(admin)) {
-                this.prisma.rooms.delete({ where: { name: room } });
+                yield this.prisma.rooms.delete({ where: { name: room } });
+                yield this.prisma.chat.delete({ where: { room: room } });
             }
         });
     }

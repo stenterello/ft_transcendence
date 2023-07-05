@@ -64,7 +64,7 @@ model Chat {
   id            Int       @id @default(autoincrement())
   createdAt     DateTime  @default(now())
   author        String
-  room          String
+  room          String    @unique
   message       String
 
   @@schema("chat")

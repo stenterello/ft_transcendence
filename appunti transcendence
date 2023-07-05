@@ -15,13 +15,13 @@ TESTING:
             . se, nel form di creazione della room, si preme invio invece di cliccare su submit, la creazione non ha luogo,
                 per come la vedo si può ignorare il problema. Fammi sapere che ne pensi
 
-            . aggiungere il controllo che quando aggiunge l'utente tra i members, l'utente non sia già presente (modo più facile di risolvere un problema)
+            . aggiungere il controllo che quando aggiunge l'utente tra i members, l'utente non sia già presente (modo più facile di risolvere un problema) // fatto
 
-            . la funzione ban da backend deve anche togliere l'utente dai members
+            . la funzione ban da backend deve anche togliere l'utente dai members // fatto
 
             . promote/demote -> working (quando si diventa admin viene ricaricata solo la sezione della chat  e, in alto, la rooom non appare tra "your rooms" ma in "rooms available" fino al prossimo ricaricamento della sezione room. Ignorabile, secondo me)
 
-            . il delete room non cancella veramente la room -> se ricreo una room con lo stesso nome, riappaiono i messaggi. Non che sia per forza sbagliato, solo per avvisare
+            . il delete room non cancella veramente la room -> se ricreo una room con lo stesso nome, riappaiono i messaggi. Non che sia per forza sbagliato, solo per avvisare // corretto
 
             .c'è da aggiungere un messaggio websocket (da backend a frontend) su 'roomsChanged', vuoto, che sia inviato a tutti gli utenti connessi attualmente, e deve essere inviato ogni volta che viene creata una nuova room o ne viene eliminata un'altra, oppure deve essere inviata esclusivamente all'utente oggetto di promote e demote admin (per risolvere il relativo problema di cui sopra);
 

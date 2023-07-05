@@ -105,7 +105,8 @@ export class ChatService {
 			}
 		});
 		if (targetRoom?.admins.includes(admin)) {
-			this.prisma.rooms.delete({ where: { name: room }});
+			await this.prisma.rooms.delete({ where: { name: room }});
+			await this.prisma.chat.delete({ where: { room: room }});
 		}
 
 	}

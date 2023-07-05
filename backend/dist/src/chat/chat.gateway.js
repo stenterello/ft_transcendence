@@ -317,9 +317,10 @@ let ChatGateway = class ChatGateway {
                         return false;
                     }
                 }
-                console.log("password ok");
-                yield this.chatRepository.addMember(json['room'], user.username);
-                yield this.server.in(client.id).socketsJoin(room.name);
+                if (!room.members.includes(user.username)) {
+                    yield this.chatRepository.addMember(json['room'], user.username);
+                    yield this.server.in(client.id).socketsJoin(room.name);
+                }
                 return true;
             }
         });
@@ -399,6 +400,7 @@ let ChatGateway = class ChatGateway {
             const toBan = yield this.userService.findByName(json['user']);
             if (room && user && room.admins.includes(user.username) && toBan) {
                 if ((yield this.chatRepository.ban(room.name, toBan.username)) && toBan.socketId) {
+                    this.chatRepository.removeMember(room.name, toBan.username);
                     this.server.to(toBan.socketId).emit('kicked', { room: room.name });
                     return yield this.server.in(toBan.socketId).socketsLeave(room.name);
                 }

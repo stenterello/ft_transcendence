@@ -311,9 +311,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
           return false;
         }
       }
-      console.log("password ok");
-      await this.chatRepository.addMember(json['room'], user.username);
-      await this.server.in(client.id).socketsJoin(room.name);
+      if (!room.members.includes(user.username)) {
+        await this.chatRepository.addMember(json['room'], user.username);
+        await this.server.in(client.id).socketsJoin(room.name);
+      }
       return true;
     }
   }
@@ -393,6 +394,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const toBan: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username) && toBan) {
       if (await this.chatRepository.ban(room.name, toBan.username) && toBan.socketId) {
+        this.chatRepository.removeMember(room.name, toBan.username);
         this.server.to(toBan.socketId).emit('kicked', {room: room.name});
         return await this.server.in(toBan.socketId).socketsLeave(room.name);
       }
