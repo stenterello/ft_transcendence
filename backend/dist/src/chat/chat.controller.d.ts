@@ -21,6 +21,6 @@ export declare class ChatController {
         author: string;
         message: string;
     }[]>;
-    createRoom(room: string, data: Map<string, string>): Promise<Rooms>;
+    createRoom(room: string, data: Map<string, string>): Promise<boolean>;
     clearRooms(): Promise<import(".prisma/client").Prisma.BatchPayload>;
 }

@@ -84,7 +84,8 @@ export class ChatService {
 
 	async createRoom(room: RoomDto) {
 		try {
-			return await this.prisma.rooms.create({data: room});
+			await this.prisma.rooms.create({data: room});
+			return this.chatGateway.pingRooms();
 		} catch (e) {
 			if (e instanceof Prisma.PrismaClientKnownRequestError) {
 				if (e.code == "P2002") {
@@ -107,6 +108,7 @@ export class ChatService {
 		if (targetRoom?.admins.includes(admin)) {
 			await this.prisma.rooms.delete({ where: { name: room }});
 			await this.prisma.chat.delete({ where: { room: room }});
+			return this.chatGateway.pingRooms();
 		}
 
 	}

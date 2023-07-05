@@ -516,4 +516,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return this.users
   }
 
+  async pingRooms() {
+    return this.server.emit('roomsChanged');
+  }
+
 }

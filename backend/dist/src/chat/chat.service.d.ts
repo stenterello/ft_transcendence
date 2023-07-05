@@ -27,6 +27,6 @@ export declare class ChatService {
         author: string;
         message: string;
     }[]>;
-    createRoom(room: RoomDto): Promise<Rooms>;
-    deleteRoom(admin: string, room: string): Promise<void>;
+    createRoom(room: RoomDto): Promise<boolean>;
+    deleteRoom(admin: string, room: string): Promise<boolean | undefined>;
 }

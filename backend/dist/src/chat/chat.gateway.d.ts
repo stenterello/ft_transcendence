@@ -40,4 +40,5 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     inviteToRoom(client: Socket, data: any): Promise<boolean>;
     sendToRoom(client: Socket, data: any): Promise<boolean | "user muted" | undefined>;
     getUser(): Promise<string[]>;
+    pingRooms(): Promise<boolean>;
 }

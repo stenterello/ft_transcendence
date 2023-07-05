@@ -106,7 +106,8 @@ let ChatService = class ChatService {
     createRoom(room) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.prisma.rooms.create({ data: room });
+                yield this.prisma.rooms.create({ data: room });
+                return this.chatGateway.pingRooms();
             }
             catch (e) {
                 if (e instanceof client_1.Prisma.PrismaClientKnownRequestError) {
@@ -131,6 +132,7 @@ let ChatService = class ChatService {
             if (targetRoom === null || targetRoom === void 0 ? void 0 : targetRoom.admins.includes(admin)) {
                 yield this.prisma.rooms.delete({ where: { name: room } });
                 yield this.prisma.chat.delete({ where: { room: room } });
+                return this.chatGateway.pingRooms();
             }
         });
     }

@@ -522,6 +522,11 @@ let ChatGateway = class ChatGateway {
             return this.users;
         });
     }
+    pingRooms() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.server.emit('roomsChanged');
+        });
+    }
 };
 __decorate([
     (0, websockets_1.WebSocketServer)(),
