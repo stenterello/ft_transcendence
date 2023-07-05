@@ -19,6 +19,8 @@ TESTING:
 
             . la funzione ban da backend deve anche togliere l'utente dai members
 
+            . promote/demote -> working (quando si diventa admin viene ricaricata solo la sezione della chat  e, in alto, la rooom non appare tra "your rooms" ma in "rooms available" fino al prossimo ricaricamento della sezione room. Ignorabile, secondo me)
+
 
     - USER ACCOUNT
         . friend request -> working

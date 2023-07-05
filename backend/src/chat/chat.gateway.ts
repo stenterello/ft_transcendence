@@ -437,7 +437,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const toPromote: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username) && user.socketId) {
+      if (toPromote && toPromote.socketId)
+        this.server.to(toPromote.socketId).emit('reload', {room: room.name});
       return await this.chatRepository.addAdmin(room.name, json['user']);
     }
     throw new BadRequestException("user not found or action not permitted");
@@ -448,7 +451,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const toDemote: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username)) {
+      if (toDemote && toDemote.socketId)
+        this.server.to(toDemote.socketId).emit('reload', {room: room.name});
       return this.chatRepository.removeAdmin(room.name, json['user']); 
     }
     throw new ForbiddenException("You need to be admin to perform this action");

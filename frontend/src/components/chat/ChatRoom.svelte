@@ -60,6 +60,11 @@
         }
     })
 
+    $socket.on('reload', (data: Object) => {
+        if (data['room'] === $roomSelected)
+            optionChange = (optionChange) ? false : true;
+    })
+
 </script>
 
 {#key optionChange}

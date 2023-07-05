@@ -443,7 +443,10 @@ let ChatGateway = class ChatGateway {
             const json = JSON.parse(data);
             const user = yield this.userService.findBySocket(client.id);
             const room = yield this.chatRepository.getRooms(json['room']);
+            const toPromote = yield this.userService.findByName(json['user']);
             if (room && user && room.admins.includes(user.username) && user.socketId) {
+                if (toPromote && toPromote.socketId)
+                    this.server.to(toPromote.socketId).emit('reload', { room: room.name });
                 return yield this.chatRepository.addAdmin(room.name, json['user']);
             }
             throw new common_1.BadRequestException("user not found or action not permitted");
@@ -454,7 +457,10 @@ let ChatGateway = class ChatGateway {
             const json = JSON.parse(data);
             const user = yield this.userService.findBySocket(client.id);
             const room = yield this.chatRepository.getRooms(json['room']);
+            const toDemote = yield this.userService.findByName(json['user']);
             if (room && user && room.admins.includes(user.username)) {
+                if (toDemote && toDemote.socketId)
+                    this.server.to(toDemote.socketId).emit('reload', { room: room.name });
                 return this.chatRepository.removeAdmin(room.name, json['user']);
             }
             throw new common_1.ForbiddenException("You need to be admin to perform this action");
