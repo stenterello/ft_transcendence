@@ -85,6 +85,8 @@
 			return '[protected]';
 	}
 
+	$socket.on('roomsChanged', () => { reloadRooms = (reloadRooms) ? false : true; })
+
 </script>
 
 {#key reloadRooms}

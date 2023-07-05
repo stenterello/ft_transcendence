@@ -356,10 +356,18 @@ let ChatGateway = class ChatGateway {
     }
     deleteRoom(client, data) {
         return __awaiter(this, void 0, void 0, function* () {
+            const json = JSON.parse(data);
             const user = yield this.userService.findBySocket(client.id);
-            const room = yield this.chatRepository.getRooms(data);
+            const room = yield this.chatRepository.getRooms(json['room']);
             if (user && room && room.admins.includes(user.username)) {
                 const arr = yield this.chatRepository.getRoomMembers(room.name);
+                if (arr) {
+                    for (let i = 0; i < arr.length; i++) {
+                        let user = yield this.userService.findByName(arr[i]);
+                        if (user && user.socketId)
+                            this.server.to(user.socketId).emit('kicked', { room: room.name });
+                    }
+                }
                 if (arr && arr.length > 0) {
                     this.server.in(arr).socketsLeave(room.name);
                 }

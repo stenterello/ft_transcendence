@@ -350,10 +350,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage("deleteRoom")
   async deleteRoom(client: Socket, data: string) {
+    const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
-    const room: Rooms | null = await this.chatRepository.getRooms(data);
+    const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     if (user && room && room.admins.includes(user.username)) {
       const arr = await this.chatRepository.getRoomMembers(room.name);
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          let user: User = await this.userService.findByName(arr[i]);
+          if (user && user.socketId)
+            this.server.to(user.socketId).emit('kicked', {room: room.name});
+        }
+      }
       if (arr && arr.length > 0) {
         this.server.in(arr).socketsLeave(room.name);
       }
