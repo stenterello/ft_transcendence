@@ -24,17 +24,16 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const bcrypt_1 = require("../utils/bcrypt");
 const json = {
-    "win 1 round": false,
-    "win 5 round": false,
-    "win 10 rounds": false,
-    "win 20 rounds": false,
-    "win 50 rounds": false,
-    "change name": false,
-    "upload avatar": false,
-    "play 1 game": false,
-    "play 10 games": false,
-    "play 20 games": false,
-    "play 50 games": false
+    "Kill bill": false,
+    "Leader of the Crazy 88s": false,
+    "Vernita Green's daughter": false,
+    "Five Point Palm Exploding Heart Technique": false,
+    "Elle Driver's fan": false,
+    "Master of swords": false,
+    "Yakuza leader": false,
+    "The only man I ever loved": false,
+    "The Bride": false,
+    "Eagle's Claw Style": false
 };
 let UserService = class UserService {
     constructor(prisma) {

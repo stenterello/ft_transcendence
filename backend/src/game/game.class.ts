@@ -144,7 +144,7 @@ export class Game {
                         return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
                     }
                 }
-            }, 80);
+            }, 100);
         })
     }
 
@@ -204,6 +204,7 @@ export class Game {
                     data: { loses: { increment: 1},
                             matches: { increment: 1 }},
                 })
+                checkAchievement(this.user1!, this.user2!, this.prisma, this.P1 + "-" + this.P2);
             } else if (this.P2 === 5) {
                 await this.prisma.user.update({
                     where: { socketId: this.P2Sock },
@@ -215,10 +216,9 @@ export class Game {
                     data: { loses: { increment: 1},
                             matches: { increment: 1 }},
                 })
+                checkAchievement(this.user2!, this.user1!, this.prisma, this.P1 + "-" + this.P2);
             }
         }
-        checkAchievement(this.user1!, this.prisma);
-        checkAchievement(this.user2!, this.prisma);
 
     }
 

@@ -147,7 +147,7 @@ class Game {
                             return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
                         }
                     }
-                }), 80);
+                }), 100);
             }));
         });
     }
@@ -207,6 +207,7 @@ class Game {
                         data: { loses: { increment: 1 },
                             matches: { increment: 1 } },
                     });
+                    (0, achievement_1.checkAchievement)(this.user1, this.user2, this.prisma, this.P1 + "-" + this.P2);
                 }
                 else if (this.P2 === 5) {
                     yield this.prisma.user.update({
@@ -219,10 +220,9 @@ class Game {
                         data: { loses: { increment: 1 },
                             matches: { increment: 1 } },
                     });
+                    (0, achievement_1.checkAchievement)(this.user2, this.user1, this.prisma, this.P1 + "-" + this.P2);
                 }
             }
-            (0, achievement_1.checkAchievement)(this.user1, this.prisma);
-            (0, achievement_1.checkAchievement)(this.user2, this.prisma);
         });
     }
     addSpect(client) {
