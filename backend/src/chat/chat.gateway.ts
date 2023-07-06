@@ -370,6 +370,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    console.log('test');
+    console.log(user);
+    console.log(room);
     if (user && room && room.admins.includes(user.username)) {
       const arr = await this.chatRepository.getRoomMembers(room.name);
       if (arr) {
@@ -382,8 +385,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (arr && arr.length > 0) {
         this.server.in(arr).socketsLeave(room.name);
       }
+      await this.prisma.rooms.delete({ where: { name: room.name }});
       this.pingRooms();
-      return await this.prisma.rooms.delete({ where: { name: room.name }});
+      return ;
     }
     throw new ForbiddenException("you don't have permission to perform this action")
   }
@@ -413,6 +417,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (await this.chatRepository.ban(room.name, toBan.username) && toBan.socketId) {
         this.chatRepository.removeMember(room.name, toBan.username);
         this.server.to(toBan.socketId).emit('kicked', {room: room.name});
+        this.server.to(toBan.socketId).emit('roomsChanged');
         return await this.server.in(toBan.socketId).socketsLeave(room.name);
       }
     }
@@ -452,10 +457,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
+    const toUnban: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username)) {
-        this.chatRepository.unban(room.name, json['user']);
+        await this.chatRepository.unban(room.name, json['user']);
         this.server.in(client.id).socketsLeave(room.name);
-        return "user banned";
+        if (toUnban && toUnban.socketId)
+          this.server.to(toUnban.socketId).emit('roomsChanged');
+        return "user unbanned";
       }
     }
 
@@ -466,8 +474,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     const toPromote: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username) && user.socketId) {
-      if (toPromote && toPromote.socketId)
+      if (toPromote && toPromote.socketId) {
         this.server.to(toPromote.socketId).emit('reload', {room: room.name});
+        this.server.to(toPromote.socketId).emit('roomsChanged');
+      }
       return await this.chatRepository.addAdmin(room.name, json['user']);
     }
     throw new BadRequestException("user not found or action not permitted");
@@ -480,8 +490,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     const toDemote: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username)) {
-      if (toDemote && toDemote.socketId)
+      if (toDemote && toDemote.socketId) {
         this.server.to(toDemote.socketId).emit('reload', {room: room.name});
+        this.server.to(toDemote.socketId).emit('roomsChanged');
+      }
       return this.chatRepository.removeAdmin(room.name, json['user']); 
     }
     throw new ForbiddenException("You need to be admin to perform this action");

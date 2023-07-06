@@ -41,6 +41,11 @@
 
 	async function	chooseRoom(event): Promise<void> {
 		roomInfo = rooms.find(elem => elem['name'] === event.target.innerHTML);
+		if (roomInfo['banlist'].includes($userInfo['username']))
+		{
+			alert('You are banned. You can wait until room admins unban you - but you could find yourself waiting your entire life.')
+			return ;
+		}
 		if (roomInfo['password'] !== null && roomInfo['members'].includes($userInfo['username']) === false)
 		{
 			room = event.target.innerHTML;
@@ -54,7 +59,7 @@
 	}
 
 	async function	tryPassword(room: string, password: string): Promise<void> {
-		const bool = await roomInfo['members'].includes($userInfo['username']);
+		const bool = roomInfo['members'].includes($userInfo['username']);
 		if (bool === false) {
 			$socket.emit('joinRoom', JSON.stringify({'room': room, 'password': password}), (res: boolean) => {
 				if (res === false) {

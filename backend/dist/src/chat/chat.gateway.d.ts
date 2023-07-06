@@ -29,12 +29,12 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     joinRoom(client: Socket, data: any): Promise<boolean | undefined>;
     leaveRoom(client: Socket, data: any): Promise<void>;
     changePwd(client: Socket, data: any): Promise<Rooms | undefined>;
-    deleteRoom(client: Socket, data: string): Promise<Rooms>;
+    deleteRoom(client: Socket, data: string): Promise<void>;
     kick(client: Socket, data: any): Promise<string>;
     ban(client: Socket, data: any): Promise<void>;
     mute(client: Socket, data: any): Promise<Rooms>;
     unmute(client: Socket, data: any): Promise<Rooms>;
-    unban(client: Socket, data: any): Promise<"user banned" | undefined>;
+    unban(client: Socket, data: any): Promise<"user unbanned" | undefined>;
     addAdmin(client: Socket, data: any): Promise<Rooms>;
     demoteAdmin(client: Socket, data: any): Promise<Rooms>;
     inviteToRoom(client: Socket, data: any): Promise<boolean>;
