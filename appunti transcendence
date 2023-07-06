@@ -38,3 +38,33 @@ TESTING:
             1. Settings dell'API della 42
             2. Link "login to ft_transcendence with 42 intra" in Login.svelte
             3. In caso cambiare il secret in GetToken.svelte 
+
+
+
+    postgres    | 2023-07-06 14:41:15.347 UTC [73] ERROR:  duplicate key value violates unique constraint "Chat_room_key"
+postgres    | 2023-07-06 14:41:15.347 UTC [73] DETAIL:  Key (room)=(1) already exists.
+postgres    | 2023-07-06 14:41:15.347 UTC [73] STATEMENT:  INSERT INTO "chat"."Chat" ("createdAt","author","room","message") VALUES ($1,$2,$3,$4) RETURNING "chat"."Chat"."id"
+backend     | [Nest] 124  - 07/06/2023, 2:41:15 PM   ERROR [WsExceptionsHandler] 
+backend     | Invalid `this.prisma.chat.create()` invocation in
+backend     | /usr/src/backend/src/chat/chat.gateway.ts:534:32
+backend     | 
+backend     |   531 if (mutelist.includes(user.username)) {
+backend     |   532   return ("user muted");
+backend     |   533 } else {
+backend     | → 534   await this.prisma.chat.create(
+backend     | Unique constraint failed on the fields: (`room`)
+backend     | PrismaClientKnownRequestError: 
+backend     | Invalid `this.prisma.chat.create()` invocation in
+backend     | /usr/src/backend/src/chat/chat.gateway.ts:534:32
+backend     | 
+backend     |   531 if (mutelist.includes(user.username)) {
+backend     |   532   return ("user muted");
+backend     |   533 } else {
+backend     | → 534   await this.prisma.chat.create(
+backend     | Unique constraint failed on the fields: (`room`)
+backend     |     at Rn.handleRequestError (/usr/src/backend/node_modules/@prisma/client/runtime/library.js:174:7325)
+backend     |     at Rn.handleAndLogRequestError (/usr/src/backend/node_modules/@prisma/client/runtime/library.js:174:6754)
+backend     |     at Rn.request (/usr/src/backend/node_modules/@prisma/client/runtime/library.js:174:6344)
+postgres    | 2023-07-06 14:41:32.350 UTC [73] ERROR:  duplicate key value violates unique constraint "Chat_room_key"
+postgres    | 2023-07-06 14:41:32.350 UTC [73] DETAIL:  Key (room)=(1) already exists.
+postgres    | 2023-07-06 14:41:32.350 UTC [73] STATEMENT:  INSERT INTO "chat"."Chat" ("createdAt","author","room","message") VALUES ($1,$2,$3,$4) RETURNING "chat"."Chat"."id"

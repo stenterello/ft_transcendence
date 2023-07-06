@@ -2,7 +2,7 @@
 
 	import { createEventDispatcher } from 'svelte';
 	import { deleteCookie, getCookie } from 'svelte-cookie';
-    import { socket, waitingGame, events, generalMessages, bearer, chat, onlineUsers, inGameUsers, userInfo, userSelected, opponent, pos } from '../../data';
+    import { socket, waitingGame, events, generalMessages, bearer, chat, onlineUsers, inGameUsers, userInfo, userSelected, opponent, pos, blockedUsers, roomSelected, webAppIP, chatTab } from '../../data';
 	import Stats from '../utils/Stats.svelte';
     import MatchHistory from '../utils/MatchHistory.svelte';
     import Game from '../game/Game.svelte';
@@ -49,6 +49,13 @@
 		$chat = false;
 		$userInfo = undefined;
 		$userSelected = undefined;
+		$blockedUsers.length = 0;
+		$waitingGame = false;
+		$roomSelected = undefined;
+		$opponent = undefined;
+		$pos = undefined;
+		$webAppIP = 'localhost:5173';
+		$chatTab = 0;
 		stopWatching();
 		dispatch('logout', { path: "/" });
 	}

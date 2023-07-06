@@ -505,7 +505,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const target: User | null = await this.userService.findByName(json['user']);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
-    if (user && target && room && target.status != 'offile' && target.socketId) {
+    if (user && target && room && target.status != 'offline' && target.socketId) {
       let newEvent = await this.prisma.user.update({
         where: { username: target.username },
         data: {
@@ -533,7 +533,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       } else {
         await this.prisma.chat.create({
           data: { room: json['room'], author: user.username, message: json['message'] },
-
         })
         return await this.server.emit(json['room'], { message: json['message'], author: user.username});
       }
