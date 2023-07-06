@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Param, Body, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Param, Body, Delete, BadRequestException } from "@nestjs/common";
 import { ChatService } from "./chat.service";
 import { RoomDto } from "./room.dto";
 import { Rooms } from "@prisma/client";
 import { ChatGateway } from "./chat.gateway";
 import { encodePassword } from "src/utils/bcrypt";
+import { authorize } from "passport";
 
 @Controller('chat')
 export class ChatController {
@@ -12,14 +13,24 @@ export class ChatController {
         private chatGateway: ChatGateway
     ) {}
 
+    @Get()
+    async showChat() {
+        return this.chatService.showChat();
+    }
+
     @Get("rooms")
     async showAll() {
         return this.chatService.showAll();
     }
 
-    @Get(':room')
-    async getRoomMsg(@Param('room') room: string) {
-        return this.chatService.showRoom(room);
+    @Get(':user')
+    async getRoomMsg(@Param('user') user: string) {
+        return this.chatService.showUserChat(user);
+    }
+
+    @Get(':author/:dest')
+    async getPrivateConv(@Param('author') author: string, @Param('dest') dest: string) {
+        return this.chatService.showPrivateConv(author, dest);
     }
 
     @Get('rooms/:user')
@@ -41,14 +52,18 @@ export class ChatController {
     @Post("create/:room")
     async createRoom(@Param('room') room: string, @Body() data: Map<string, string>) {
         const tmpPwd = data.get('password');
-        console.log(tmpPwd)
+        const policy = data.get('policy')!;
         let pwd = null;
-        if (tmpPwd) {
-            pwd = encodePassword(tmpPwd);
+        if (policy == "PROTECTED") {
+            if (tmpPwd) {
+                pwd = encodePassword(tmpPwd);
+            } else {
+                throw new BadRequestException("No password given!!");
+            }
         }
         const user = data.get("user");
-        let roomDto = {name: room, password: pwd !== null ? pwd! : null, admins: [user!], banlist: [], members: [user!]};
-        console.log("create room: " + room + ' password: ' + pwd);
+        let roomDto = {name: room, password: pwd !== null ? pwd! : null, admins: [user!], banlist: [], members: [user!], policy: policy};
+        console.log("create room: " + room + ' password: ' + pwd + ' policy: ' + policy);
         return await this.chatService.createRoom(roomDto);
     }
 

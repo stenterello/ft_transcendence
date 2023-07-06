@@ -14,4 +14,8 @@ export class RoomDto {
     banlist: Array<string> = [];
 
     members: Array<string> = [];
+
+    @IsNotEmpty()
+    @IsString()
+    policy: string;
 }

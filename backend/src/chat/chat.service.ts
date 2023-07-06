@@ -15,6 +15,10 @@ export class ChatService {
 		private chatGateway: ChatGateway,
 		private prisma: PrismaService) {}
 
+	async showChat() {
+		return await this.prisma.chat.findMany();
+	}
+
 	async showAll() {
 		return await this.prisma.rooms.findMany();
 	}
@@ -23,16 +27,28 @@ export class ChatService {
 		return await this.prisma.rooms.deleteMany();
 	}
 	
-	async showRoom(room: string) {
+	async showUserChat(user: string) {
 		return await this.prisma.chat.findMany({
 			where: {
-				room: room
+				author: user
 			},
 			select: {
 				author: true,
+				room: true,
 				message: true
 			}
 		})
+	}
+
+	async showPrivateConv(user: string, dest: string) {
+		return await this.prisma.chat.findMany({
+			orderBy: { id: 'asc'},
+			where: {
+				OR: [
+					{author: user, room: dest },
+					{author: dest, room: user},
+				]}
+			})
 	}
 
 	async getOwningRooms(user: string) {
@@ -107,7 +123,7 @@ export class ChatService {
 		});
 		if (targetRoom?.admins.includes(admin)) {
 			await this.prisma.rooms.delete({ where: { name: room }});
-			await this.prisma.chat.delete({ where: { room: room }});
+			await this.prisma.chat.deleteMany({ where: { room: room }});
 			return this.chatGateway.pingRooms();
 		}
 

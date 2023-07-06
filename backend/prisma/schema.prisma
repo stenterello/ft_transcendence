@@ -64,7 +64,7 @@ model Chat {
   id            Int       @id @default(autoincrement())
   createdAt     DateTime  @default(now())
   author        String
-  room          String    @unique
+  room          String
   message       String
 
   @@schema("chat")
@@ -73,6 +73,7 @@ model Chat {
 model Rooms {
   id            Int       @id @default(autoincrement())
   name          String    @unique
+  policy        String?
   password      String?
   admins        String[]
   banlist       String[]

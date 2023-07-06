@@ -385,7 +385,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (arr && arr.length > 0) {
         this.server.in(arr).socketsLeave(room.name);
       }
-      await this.prisma.rooms.delete({ where: { name: room.name }});
+      await this.prisma.rooms.deleteMany({ where: { name: room.name }});
       this.pingRooms();
       return ;
     }
