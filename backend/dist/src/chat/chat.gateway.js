@@ -321,6 +321,14 @@ let ChatGateway = class ChatGateway {
                     yield this.chatRepository.addMember(json['room'], user.username);
                     yield this.server.in(client.id).socketsJoin(room.name);
                 }
+                const arr = yield this.chatRepository.getRoomMembers(room.name);
+                if (arr) {
+                    for (let i = 0; i < arr.length; i++) {
+                        let user = yield this.userService.findByName(arr[i]);
+                        if (user && user.socketId)
+                            this.server.to(user.socketId).emit('usersChanged');
+                    }
+                }
                 return true;
             }
         });
@@ -332,6 +340,14 @@ let ChatGateway = class ChatGateway {
             const room = yield this.chatRepository.getRooms(json['room']);
             if (room && user && room.members.includes(user.username)) {
                 this.chatRepository.removeMember(room.name, user.username);
+                const arr = yield this.chatRepository.getRoomMembers(room.name);
+                if (arr) {
+                    for (let i = 0; i < arr.length; i++) {
+                        let user = yield this.userService.findByName(arr[i]);
+                        if (user && user.socketId)
+                            this.server.to(user.socketId).emit('usersChanged');
+                    }
+                }
                 return yield this.server.in(client.id).socketsLeave(room.name);
             }
             else {
@@ -372,6 +388,7 @@ let ChatGateway = class ChatGateway {
                 if (arr && arr.length > 0) {
                     this.server.in(arr).socketsLeave(room.name);
                 }
+                this.pingRooms();
                 return yield this.prisma.rooms.delete({ where: { name: room.name } });
             }
             throw new common_1.ForbiddenException("you don't have permission to perform this action");

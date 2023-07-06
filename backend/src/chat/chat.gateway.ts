@@ -315,6 +315,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.chatRepository.addMember(json['room'], user.username);
         await this.server.in(client.id).socketsJoin(room.name);
       }
+      const arr = await this.chatRepository.getRoomMembers(room.name);
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          let user: User = await this.userService.findByName(arr[i]);
+          if (user && user.socketId)
+            this.server.to(user.socketId).emit('usersChanged');
+        }
+      }
       return true;
     }
   }
@@ -326,6 +334,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     if (room && user && room.members.includes(user.username)) {
       this.chatRepository.removeMember(room.name, user.username);
+      const arr = await this.chatRepository.getRoomMembers(room.name);
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          let user: User = await this.userService.findByName(arr[i]);
+          if (user && user.socketId)
+            this.server.to(user.socketId).emit('usersChanged');
+        }
+      }
       return await this.server.in(client.id).socketsLeave(room.name);
     } else {
       throw new BadRequestException("are you sure room exists and user is a member of it?");
@@ -366,6 +382,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (arr && arr.length > 0) {
         this.server.in(arr).socketsLeave(room.name);
       }
+      this.pingRooms();
       return await this.prisma.rooms.delete({ where: { name: room.name }});
     }
     throw new ForbiddenException("you don't have permission to perform this action")

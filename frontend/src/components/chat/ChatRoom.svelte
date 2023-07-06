@@ -11,6 +11,7 @@
     let         messages: Array<Object> = [];
     let         newMessages: boolean = false;
     const       dispatch = createEventDispatcher();
+    let         roomInfo: Object = undefined;
 
     async function  getMessages(): Promise<void> {
         const   res: Response = await fetch('http://localhost:3000/chat/' + $roomSelected);
@@ -21,14 +22,14 @@
         }
     }
 
-    async function  getRoomObject(): Promise<Object> {
+    async function  getRoomObject(): Promise<void> {
         await mock();
         const   res: Response = await fetch('http://localhost:3000/chat/rooms');
         const   json: Object = await res.json();
         for (let i = 0; i < Object.values(json).length; i++) {
             if (json[i]['name'] === $roomSelected)
             {
-                return json[i];
+                roomInfo = json[i];
             }
         }
     }
@@ -65,12 +66,14 @@
             optionChange = (optionChange) ? false : true;
     })
 
+    $socket.on('usersChanged', async () => { await getRoomObject(); $statusChange = ($statusChange) ? false : true; })
+
 </script>
 
 {#key optionChange}
     {#await getRoomObject()}
         <p>loading</p>
-    {:then roomInfo} 
+    {:then} 
         <section id="chat-space">
             {#if $roomSelected !== undefined}
                 {#key $statusChange}
@@ -83,7 +86,7 @@
                         <RoomManagementBar {roomInfo} on:options={ () => {roomManagement = (roomManagement) ? false : true;} } />
                         {#if roomManagement === false}
                             {#if messages !== undefined && Object.values(messages).length > 0}
-                                <ul id="message-list-active" style="overflow: auto">
+                                <ul id="message-list-active">
                                     {#key newMessages}
                                         {#each messages as message}
                                             <Message privateMessage={message} on:message />
@@ -93,7 +96,7 @@
                             {:else}
                                 {#key newMessages}
                                     {#if messages !== undefined && Object.values(messages).length > 0}
-                                        <ul id="message-list-active" style="overflow: auto">
+                                        <ul id="message-list-active">
                                             {#each messages as message}
                                                 <Message privateMessage={message} on:message />
                                             {/each}
@@ -128,6 +131,9 @@
         background-color: white;
         border: 1px solid black;
         height: 75%;
+    }
+    #message-list-active {
+        overflow: auto;
     }
     ul {
         margin: 0;
