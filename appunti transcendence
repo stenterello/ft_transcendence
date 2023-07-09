@@ -36,6 +36,7 @@ TESTING:
             3. In caso cambiare il secret in GetToken.svelte 
 
     - TODO
+        . aggiungere da frontend status ingame
 
     - ho aggiunto una chiamata api per avere tutte le chat, solo per testare. Ho anche aggiunto una chiamata per avere la conversazione fra 2 utenti ordinata in ordine crescente (dal primo all'ultimo);
     la chiamata e': localhost:3000/chat/"author"/"dest";

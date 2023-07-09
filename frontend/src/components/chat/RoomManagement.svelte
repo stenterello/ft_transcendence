@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { userInfo, socket, roomSelected } from "../../data";
 	import { createEventDispatcher } from "svelte";
+    import { retrieveOtherUserInfo, retrieveOtherUserInfoByName } from "./interactionUtils.svelte";
 
 	export let	roomInfo: Object = undefined;
 	const		dispatch = createEventDispatcher();
@@ -58,6 +59,19 @@
         $socket.emit('changePwd', JSON.stringify({'room': $roomSelected, 'password': newPassword}));
         dispatch('optionChange', null);
     }
+
+	async function	inviteFriend(): Promise<void> {
+		const	user: string = document.getElementById('invite-friend').value;
+		console.log(document.getElementById('invite-friend'));
+		const	friend: Object = await retrieveOtherUserInfoByName(user);
+		console.log(user);
+		if (!friend)
+		{
+			alert("No user with that name!");
+			return ;
+		}
+		$socket.emit('inviteRoom', JSON.stringify({ user: user, room: $roomSelected }));
+	}
 </script>
 
 <div id="room-management-container">
@@ -101,19 +115,31 @@
 				{/each}
 			</ul>
 		</div>
-		<h4>Banned users</h4>
+		{#if roomInfo['policy'] !== 'PRIVATE'}
+			<h4>Banned users</h4>
+			<div id="third">
+				<ul class="member-options">
+					{#each roomInfo['banlist'] as banned}
+						<li>
+							<p class="user">{banned}</p>
+							<div>
+								<button on:click|preventDefault={() => unbanUser(banned) }>Unban</button>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{:else}
+		<h4>Invite new users</h4>
 		<div id="third">
-			<ul class="member-options">
-				{#each roomInfo['banlist'] as banned}
-				<li>
-					<p class="user">{banned}</p>
-					<div>
-						<button on:click|preventDefault={() => unbanUser(banned) }>Unban</button>
-					</div>
-				</li>
-				{/each}
-			</ul>
+			<form>
+				<label for="invite-friend">Insert username</label>
+				<input id="invite-friend" type="text" name="username" autocomplete="off" required>
+				<br>
+				<button id="submit-button" type="submit" on:click|preventDefault={inviteFriend}>submit</button>
+			</form>
 		</div>
+		{/if}
 	{/if}
 </div>
 

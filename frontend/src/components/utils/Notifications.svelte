@@ -81,6 +81,13 @@
 									<p>sent you new messages.</p>
 									<button on:click={() => dismiss(event)}>dismiss</button>
 								</li>
+							{:else if event['type'] === "INVITEROOM"}
+								<li>
+									<UserIcon username={event['sender']} --flex-direction="column" on:message />
+									<p>invited you to a new room.</p>
+									<button on:click={() => acceptFriendRequest(event)}>accept</button>
+									<button on:click={() => dismiss(event)}>dismiss</button>
+								</li>
 							{/if}
 						{/each}
 					</ul>
