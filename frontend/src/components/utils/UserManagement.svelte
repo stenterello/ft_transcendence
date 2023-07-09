@@ -40,7 +40,7 @@
         <button on:click={ () => dispatch('message', { path: '/profile?user=' + user['username'] }) }>Show profile</button>
 
         {#key $statusChange}
-            {#if user['status'] === 'online' && $userInfo['blocklist'].includes(user['username']) === false}
+            {#if $userInfo['friends'].includes(user['username']) && user['status'] === 'online' && $userInfo['blocklist'].includes(user['username']) === false}
                 <button>Invite to play</button>
             {/if}
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { webAppIP, userInfo, page_shown, chat, bearer, socket, events, onlineUsers, inGameUsers, statusChange, generalMessages, newMessage } from "./data";
+	import { webAppIP, userInfo, page_shown, chat, bearer, socket, events, onlineUsers, inGameUsers, statusChange, generalMessages, newMessage, waitingGame } from "./data";
     import MainPage from "./components/MainPage.svelte";
     import Logged from "./components/Logged.svelte";
     import RegistrationPage from "./components/RegistrationPage.svelte";
@@ -18,6 +18,11 @@
 	})
 
 	function	show_page(event): void {
+		if (($page_shown === "/waitingRoom" || $page_shown === '/waitingUser') && event.detail.path !== '/game')
+		{
+			$waitingGame = false;
+			$socket.emit('leaveGame');
+		}
 		if ($userInfo === undefined && event.detail.userInfo === undefined)
 			retrieveInfo();
 		if (event.detail.userInfo !== undefined)
@@ -155,8 +160,9 @@
 			path === "/game" ||
 			path === "/friends" ||
 			path === "/invitationWindow" ||
-			path === "/achievements" ||
+			path === "/waitingUser" ||
 			path === "/leaderboard" ||
+			path.startsWith('/achievements') ||
 			path.startsWith("/profile"))
 			return true;
 		return false;

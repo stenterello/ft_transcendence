@@ -13,6 +13,8 @@
     import WaitingRoom from "./game/WaitingRoom.svelte";
 	import Game from "./game/Game.svelte";
     import LeaderBoard from "./private/LeaderBoard.svelte";
+    import WaitingUser from "./game/WaitingUser.svelte";
+    import { retrieveOtherUserInfo, retrieveOtherUserInfoByName } from "./chat/interactionUtils.svelte";
 
 	function	resetHome(): void {
 		$userInfo = undefined;
@@ -31,6 +33,11 @@
 		}
 	}
 
+	async function	getUserSearched(): Promise<Object> {
+		const	ret: Object = await retrieveOtherUserInfoByName(window.location.search.split('=')[1]);
+		return ret;
+	}
+
 </script>
 
 {#await checkSetting(window.location.hash)}
@@ -47,8 +54,16 @@
 			<Friends on:message on:logout={resetHome} />
 		{:else if $page_shown === "/invitationWindow"}
 			<InvitationWindow on:message />
+		{:else if $page_shown === '/waitingUser'}
+			<WaitingUser />
 		{:else if $page_shown === "/achievements"}
 			<Achievements />
+		{:else if $page_shown.startsWith("/achievements?user=")}
+			{#await getUserSearched()}
+				<p>loading</p>
+			{:then user}
+				<Achievements {user} />
+			{/await}
 		{:else if $page_shown === "/leaderboard"}
 			<LeaderBoard on:message />
 		{:else if $page_shown.startsWith("/profile?") && userInfo['username'] !== window.location.search.substring(6)}

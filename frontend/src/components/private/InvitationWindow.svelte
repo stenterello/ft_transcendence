@@ -1,6 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
-	import { userInfo, opponent } from "../../data";
+	import { userInfo, opponent, socket } from "../../data";
+	import { createEventDispatcher } from 'svelte';
+
+	const	dispatch = createEventDispatcher();
 
 	async function  updateUser(): Promise<void> {
         const   response: Response = await fetch('http://localhost:3000/users/' + $userInfo['username'] + '-token');
@@ -33,6 +36,32 @@
 			img.setAttribute('src', 'images/maps/previews/default-preview.png');
 	}
 
+	async function	isOnline(user: string): Promise<boolean> {
+		const	userObj: Response = await fetch('http://localhost:3000/users/' + user + '-token');
+		const	json: Object = await userObj.json();
+		if (json['status'] === 'online')
+			return true;
+		return false;
+	}
+
+	async function	inviteFriendToPlay(info: Object): Promise<void> {
+		const	online: boolean = await isOnline(info['user']);
+		if (online === false) {
+			if (document.getElementById('status-err') === null) {
+				const	err: HTMLElement = document.createElement('span');
+				const	errText: Text = document.createTextNode('User is not available');
+				err.appendChild(errText);
+				err.style.color = 'red';
+				err.setAttribute('id', 'status-err');
+				document.getElementById('custom-game').appendChild(err);
+			}
+			return ;
+		}
+		$opponent = info['user'];
+		$socket.emit('customGame', JSON.stringify(info));
+		dispatch('message', { path: "/waitingUser" });
+	}
+
 	onMount(() => { if ($opponent !== undefined) { document.getElementById('opponent').value = $opponent; } });
 
 </script>
@@ -42,7 +71,7 @@
 		<p>loading</p>
 	{:then friends} 
 		{#if friends.length > 0}
-			<form>
+			<form id="custom-game">
 				<label for="opponent">choose your opponent</label>
 				<select id="opponent">
 					{#each friends as friend}
@@ -63,7 +92,11 @@
 					<option value="20">20</option>
 				</select>
 				<br>
-				<input type="submit" value="Invite friend">
+				<input on:click|preventDefault={() => inviteFriendToPlay({
+					user: document.getElementById('opponent').value,
+					map: document.getElementById('map').value,
+					points: document.getElementById('points').value
+				})} type="submit" value="Invite friend">
 			</form>
 			<div id="map-preview">
 				<p>Map preview</p>

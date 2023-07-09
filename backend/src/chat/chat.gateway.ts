@@ -175,7 +175,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const user: User | null = await this.userService.findBySocket(client.id);
     const friend: User | null = await this.userService.findByName(data);
     if (user && friend) {
-      return await this.chatRepository.delFriend(user.username, friend.username);
+      await this.chatRepository.delFriend(user.username, friend.username);
+      return ;
     }
   }
 

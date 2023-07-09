@@ -15,16 +15,24 @@ TESTING:
             . se, nel form di creazione della room, si preme invio invece di cliccare su submit, la creazione non ha luogo,
                 per come la vedo si può ignorare il problema. Fammi sapere che ne pensi
 
+            .privateRoom -> gestire le notifiche
+
     - USER ACCOUNT
         . friend request -> working
         . notification -> working
         . block / unblock -> working
         . settings -> all working
+        profile page di amico -> se si rimuove l'amico la pagina deve ricaricarsi
 
     - GAME
         . general -> working
         . matches -> working
-        . private game -> to implement
+        . private game -> al momento viene inviata una chiamata socket 'customGame' con un oggetto con seguenti campi: {
+            user: string = opponent,
+            map: string = path dell'immagine,
+            points: string = punteggio per la vittoria
+        }
+            - da gestire l'abbandono della partita mentre si attende risposta dell'opponent
         . achievement -> to implement
         . leaderboard -> working
 

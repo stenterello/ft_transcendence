@@ -20,7 +20,7 @@
 		</div>
 		<div class="right">
 			{#key $statusChange}
-				{#if user['status'] === 'online'}
+				{#if user['status'] === 'online' && $userInfo['friends'].includes(user['username'])}
 					<button on:click={() => {
 						$socket.emit('invite to private game', JSON.stringify({user: user['username']}));
 						dispatch('message', { path: '/waitingUser', opponent: user['username'] });

@@ -70,7 +70,7 @@
                     break ;
                 }
                 case 2: {
-                    if (user['status'] !== 'online')
+                    if (user['status'] !== 'online' || $userInfo['friends'].includes(user['username']) === false)
                         continue ;
                     button[i] = document.createElement('button');
                     button[i].style.fontSize = '0.6em';
