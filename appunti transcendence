@@ -15,10 +15,6 @@ TESTING:
             . se, nel form di creazione della room, si preme invio invece di cliccare su submit, la creazione non ha luogo,
                 per come la vedo si può ignorare il problema. Fammi sapere che ne pensi
 
-            . promote/demote -> working (quando si diventa admin viene ricaricata solo la sezione della chat  e, in alto, la rooom non appare tra "your rooms" ma in "rooms available" fino al prossimo ricaricamento della sezione room. Ignorabile, secondo me)
-
-            .c'è da aggiungere un messaggio websocket (da backend a frontend) su 'roomsChanged', vuoto, che sia inviato a tutti gli utenti connessi attualmente, e deve essere inviato ogni volta che viene creata una nuova room o ne viene eliminata un'altra, oppure deve essere inviata esclusivamente all'utente oggetto di promote e demote admin (per risolvere il relativo problema di cui sopra);
-
     - USER ACCOUNT
         . friend request -> working
         . notification -> working
@@ -40,8 +36,6 @@ TESTING:
             3. In caso cambiare il secret in GetToken.svelte 
 
     - TODO
-        . quando si crea una stanza, bisogna inviare anche il tipo di policy
-        . policy accettate: "PUBLIC", "PROTECTED", "PRIVATE"
 
     - ho aggiunto una chiamata api per avere tutte le chat, solo per testare. Ho anche aggiunto una chiamata per avere la conversazione fra 2 utenti ordinata in ordine crescente (dal primo all'ultimo);
     la chiamata e': localhost:3000/chat/"author"/"dest";

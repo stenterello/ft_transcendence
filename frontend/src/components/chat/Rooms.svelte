@@ -90,6 +90,14 @@
 			return '[protected]';
 	}
 
+	function	isToShow(room: Object): boolean {
+		if (room['banlist'].includes($userInfo['username']))
+			return false;
+		if (room['policy'] === 'PRIVATE' && room['members'].includes($userInfo['username']) === false)
+			return false;
+		return true;
+	}
+
 	$socket.on('roomsChanged', () => { reloadRooms = (reloadRooms) ? false : true; })
 
 </script>
@@ -107,7 +115,9 @@
 				{:else}
 					<ul>
 						{#each otherRooms as room}
-							<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button><span>{roomPrivacy(room)}</span></li>
+							{#if isToShow(room)}
+								<li><button on:click|preventDefault={chooseRoom}>{room['name']}</button><span>{roomPrivacy(room)}</span></li>
+							{/if}
 						{/each}
 					</ul>
 				{/if}

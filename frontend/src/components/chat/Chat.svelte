@@ -123,18 +123,20 @@
 			<PrivateMessages on:select-change={setUserSelected} />
 		{/if}
 		<div id="user-input">
-			{#key muteChange}
-				{#await isMuted()}
-					<textarea on:keydown={checkAndSendMessage} id="user-text" name="user-text" placeholder="write your message..."></textarea>
-					<button on:click={sendMessage} id="send">send</button>
-				{:then isMuted} 
-					{#if isMuted}
-						<p>You are muted</p>
-					{:else}
+			{#key $roomSelected}
+				{#key muteChange}
+					{#await isMuted()}
 						<textarea on:keydown={checkAndSendMessage} id="user-text" name="user-text" placeholder="write your message..."></textarea>
 						<button on:click={sendMessage} id="send">send</button>
-					{/if}
-				{/await}
+					{:then isMuted} 
+						{#if isMuted}
+							<p>You are muted</p>
+						{:else}
+							<textarea on:keydown={checkAndSendMessage} id="user-text" name="user-text" placeholder="write your message..."></textarea>
+							<button on:click={sendMessage} id="send">send</button>
+						{/if}
+					{/await}
+				{/key}
 			{/key}
 		</div>
 	</div>

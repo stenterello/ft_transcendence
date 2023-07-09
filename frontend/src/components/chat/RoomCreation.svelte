@@ -5,7 +5,7 @@
 	const	dispatch = createEventDispatcher();
 
 	function	isPassword(event): void {
-		if (event.target.value === 'protected')
+		if (event.target.value === 'PROTECTED')
 		{
 			const	input: HTMLInputElement = document.createElement('input');
 			input.type = 'text';
@@ -20,12 +20,13 @@
 
 	async function	createRoom(): Promise<void> {
 		const	roomName: string = document.getElementById('room-name').value;
+		const	policy: string = document.getElementById('room-privacy').value;
 		let		password: string | null = null;
-		console.log('ciao');
 
 		if (document.getElementById('room-password-create') !== null)
 			password = document.getElementById('room-password-create').value;
-		const	json: Object = { user: $userInfo['username'], password: password };
+
+		const	json: Object = { user: $userInfo['username'], password: password, policy: policy};
 
 		const	response: Response = await fetch('http://localhost:3000/chat/create/' + roomName, {
 			method: 'POST',
@@ -62,9 +63,9 @@
 	<br>
 	<label for="room-privacy">Set privacy option</label>
 	<select id="room-privacy" on:change={isPassword} >
-		<option value="public">public</option>
-		<option value="protected">protected</option>
-		<option value="private">private</option>
+		<option value="PUBLIC">public</option>
+		<option value="PROTECTED">protected</option>
+		<option value="PRIVATE">private</option>
 	</select>
 	<br>
 	<br>

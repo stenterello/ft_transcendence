@@ -474,11 +474,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     const toPromote: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username) && user.socketId) {
+      await this.chatRepository.addAdmin(room.name, json['user']);
       if (toPromote && toPromote.socketId) {
         this.server.to(toPromote.socketId).emit('reload', {room: room.name});
         this.server.to(toPromote.socketId).emit('roomsChanged');
       }
-      return await this.chatRepository.addAdmin(room.name, json['user']);
+      return ;
     }
     throw new BadRequestException("user not found or action not permitted");
   }
@@ -490,11 +491,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
     const toDemote: User | null = await this.userService.findByName(json['user']);
     if (room && user && room.admins.includes(user.username)) {
+      await this.chatRepository.removeAdmin(room.name, json['user'])
       if (toDemote && toDemote.socketId) {
         this.server.to(toDemote.socketId).emit('reload', {room: room.name});
         this.server.to(toDemote.socketId).emit('roomsChanged');
       }
-      return this.chatRepository.removeAdmin(room.name, json['user']); 
+      return ; 
     }
     throw new ForbiddenException("You need to be admin to perform this action");
   }
