@@ -23,6 +23,7 @@ import axios, { AxiosResponse } from 'axios';
 import { Redirect } from '@nestjs/common';
 
 const grant_type: string = 'authorization_code';
+const appUID: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
 const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
 const client_secret: string = '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';
 const redirect_uri: string = 'https://www.google.com';
@@ -35,20 +36,29 @@ export class AuthController {
         private readonly httpService: HttpService,
 	) {}
 
+    @Get()
+    @Redirect(`https://api.intra.42.fr/oauth/authorize?client_id=${appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code`)
+    async sendAuth() {
+        // console.log(this.httpService.get("https://api.intra.42.fr/oauth/authorize?client_id=${appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code"))
+    }
+
     @Get('code')
-    // @Redirect('/auth/access_token')
     async getCode(@Res() res: any, @Req() req: Request) {
         const url = req.url;
         const url_split = url.split("=");
         const code = url_split[1];
         console.log(code);
-        const body = "grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&code={code}&redirect_uri=${redirect_uri}";
-        this.httpService.post(
-            'https://api.intra.42.fr/oauth/token',
-            { body: body.toString},
-            { headers: { 'content-type': 'application/x-www-form-urlencoded' }}
-            );
-            // res.redirect('/auth/access_token');
+        const body: string = `grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&code=${code}&redirect_uri=${redirect_uri}`;
+        res.header('content-type', 'application/x-www-form-urlencoded');
+        res.header('method', 'POST');
+        res.url = 'https://api.intra.42.fr/oauth/token';
+        res.body = body;
+        console.log(res);
+        // this.httpService.post(
+        //     'https://api.intra.42.fr/oauth/token',
+        //     { body: body.toString},
+        //     { headers: { 'content-type': 'application/x-www-form-urlencoded' }}
+        //     );
         }
 
     @Get('access_token')
