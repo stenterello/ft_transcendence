@@ -25,11 +25,13 @@ import { GameGateway, PrivateGameGateway } from './game/game.gateway';
 import { GameModule } from './game/game.module';
 import { GameController } from './game/game.controller';
 import { GameService } from './game/game.service';
+import { HttpModule, HttpService } from '@nestjs/axios';
 
 @Module({
   imports: [
     ChatModule,
     GameModule,
+    HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

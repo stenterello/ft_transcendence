@@ -15,7 +15,7 @@
 		const cookieDays: number = 7;
 
 		const response: Response = await loginWithPassword(username, password);
-		
+		console.log("login");
 		if (response.ok) {
 			const	json: Object = await response.json();
 			const	bearer: string = json['access_token'];
@@ -49,7 +49,7 @@
 <section>
 	
 	<div style="margin-bottom: 35px;">
-		<a href="https://api.intra.42.fr/oauth/authorize?client_id={appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=code">
+		<a href="https://api.intra.42.fr/oauth/authorize?client_id={appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code">
 			Login to ft_transcendence with 42intra
 		</a>
 	</div>
