@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import { webAppIP } from "../../data";
+
     export let  userInfo: Object;
 
     function	winningRatio(matches: number, victories: number): Number {
@@ -8,7 +10,7 @@
 	}
 
     async function	getUsers(): Promise<Array<Object>> {
-		const	response: Response = await fetch('http://localhost:3000/users');
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users`);
 		const	ret: Object = await response.json();
 		return Object.values(ret);
 	}

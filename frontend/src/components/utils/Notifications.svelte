@@ -1,8 +1,7 @@
 <script lang="ts">
 
-	import { socket, userInfo } from "../../data";
+	import { socket, userInfo, webAppIP, events } from "../../data";
 	import { createEventDispatcher } from 'svelte';
-	import { events } from "../../data";
     import UserIcon from "./UserIcon.svelte";
 	
 	let			changed: number = 0;
@@ -10,7 +9,7 @@
 	const		dispatch = createEventDispatcher();
 
 	async function	getNotifications(): Promise<void> {
-		const	response: Response = await fetch('http://localhost:3000/users/events/' + $userInfo['username']);
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/events/` + $userInfo['username']);
 		const	json: Object = await response.json();
 		$events = Array.from(Object.values(json['events']));
 	}

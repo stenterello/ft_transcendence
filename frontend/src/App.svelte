@@ -11,6 +11,7 @@
 
 	$page_shown = window.location.pathname + window.location.search;
 	$webAppIP = window.location.host.split(':')[0];
+	console.log($webAppIP);
 
 	window.addEventListener("popstate", e => {
 		$userInfo = retrieveInfo();
@@ -50,7 +51,7 @@
 			['cookie', cookie]
 		]);
 		const	json: Object = Object.fromEntries(map);
-		const	response: Response = await fetch('http://localhost:3000/users/isCookie', {
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/isCookie`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
@@ -63,7 +64,7 @@
 	}
 
 	async function	setSocket(): Promise<void> {
-		$socket = io('http://localhost:3000/', {
+		$socket = io(`http://${$webAppIP}:3000/`, {
 			extraHeaders: {
 				username: $userInfo['username']
 			}
@@ -140,7 +141,7 @@
 			resetHome();
 			return (null);
 		}
-		const	response: Response = await fetch('http://localhost:3000/users/' + cookie);
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/` + cookie);
 		if (response.body === null)
 		{
 			resetHome();

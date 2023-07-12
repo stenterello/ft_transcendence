@@ -3,6 +3,7 @@
 	import { setCookie } from "svelte-cookie";
 	import { addDays } from "./authenticationUtils.svelte"
 	import { createEventDispatcher } from "svelte";
+	import { webAppIP } from "../../data";
 
 	export let userInfo: Map<string, string> | null = undefined;
 	const	dispatch = createEventDispatcher();
@@ -17,7 +18,7 @@
 		json['cookie'] = json['username'] + '-token';
 		json['expires'] = addDays(date, 7).toISOString();
 
-		await fetch('http://localhost:3000/users/auth', {
+		await fetch(`http://${$webAppIP}:3000/users/auth`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',

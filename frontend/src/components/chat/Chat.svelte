@@ -1,11 +1,10 @@
 <script lang="ts">
 
 	import { createEventDispatcher } from 'svelte';
-	import { chat, socket, userInfo, bearer, userSelected, roomSelected, chatTab } from '../../data';
+	import { chat, socket, userInfo, bearer, userSelected, roomSelected, chatTab, webAppIP } from '../../data';
 	import GeneralChat from './GeneralChat.svelte';
 	import Rooms from './Rooms.svelte';
 	import PrivateMessages from './PrivateMessages.svelte';
-    import { retrieveOtherUserInfo } from './interactionUtils.svelte';
 
 	let			height: string = ($chat) ? '90vh' : '0';
 
@@ -45,7 +44,7 @@
 	}
 
 	async function	updateUserInfo(): Promise<void> {
-		const	response: Response = await fetch('http://localhost:3000/users/' + $userInfo['username'] + '-token');
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/` + $userInfo['username'] + '-token');
 		const	json: Object = await response.json();
 		$userInfo = json;
 		if ($bearer.length > 0)
@@ -73,7 +72,7 @@
 
 	async function  getRoomObject(): Promise<Object> {
         await mock();
-        const   res: Response = await fetch('http://localhost:3000/chat/rooms');
+        const   res: Response = await fetch(`http://${$webAppIP}:3000/chat/rooms`);
         const   json: Object = await res.json();
         for (let i = 0; i < Object.values(json).length; i++) {
             if (json[i]['name'] === $roomSelected)

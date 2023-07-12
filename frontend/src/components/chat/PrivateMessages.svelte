@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { newMessage, onlineUsers, statusChange, userInfo, userSelected, socket, bearer } from "../../data";
+    import { newMessage, onlineUsers, statusChange, userInfo, userSelected, socket, bearer, webAppIP } from "../../data";
 	import { createEventDispatcher } from "svelte";
     import OnlineUsersPrivateMessages from "./OnlineUsersPrivateMessages.svelte";
 	import PrivateChat from "./PrivateChat.svelte";
-    import { retrieveOtherUserInfoByName, getStatus } from "./interactionUtils.svelte";
+    import { retrieveOtherUserInfoByName } from "./interactionUtils.svelte";
 	import MessagesButton from "./MessagesButton.svelte";
 
 	const	dispatch = createEventDispatcher();
@@ -20,7 +20,7 @@
 	$socket.on('private message', () => { $newMessage = ($newMessage) ? false : true; });
 
 	async function	updateUserInfo(): Promise<void> {
-		const	response: Response = await fetch('http://localhost:3000/users/' + $userInfo['username'] + '-token');
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/` + $userInfo['username'] + '-token');
 		const	json: Object = await response.json();
 		$userInfo = json;
 		if ($bearer.length > 0)
@@ -52,7 +52,7 @@
 				<div id="message-history">
 					<ul>
 					{#each $userInfo['privateConv'] as conversation}
-						{#await retrieveOtherUserInfoByName(conversation)}
+						{#await retrieveOtherUserInfoByName(conversation, $webAppIP)}
 							<p>loading</p>
 						{:then user}
 							<MessagesButton {user} on:select-change />

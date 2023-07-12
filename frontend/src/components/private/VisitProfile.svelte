@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { inGameUsers, onlineUsers, socket, userInfo, blockedUsers } from "../../data";
+    import { inGameUsers, onlineUsers, socket, userInfo, blockedUsers, webAppIP } from "../../data";
 	import { blockUser, unblockUser, retrieveOtherUserInfo } from "../chat/interactionUtils.svelte";
     import Stats from "../utils/Stats.svelte";
     import MatchHistory from "../utils/MatchHistory.svelte";
@@ -24,7 +24,7 @@
 </script>
 
 {#key changed}
-	{#await retrieveOtherUserInfo()}
+	{#await retrieveOtherUserInfo($webAppIP)}
 		<p>Loading</p>
 	{:then otherUserInfo}
 		{#if otherUserInfo === null}
@@ -54,9 +54,9 @@
 						<button>Invite to play</button>
 					{/if}
 					{#if $userInfo['blocklist'].includes(otherUserInfo['username']) === false}
-						<button on:click|preventDefault={ async () => { await blockUser($userInfo, otherUserInfo['username']); $blockedUsers = $blockedUsers.concat(otherUserInfo['username']); dispatch('message', { path: '/profile' })} } >Block user</button>
+						<button on:click|preventDefault={ async () => { await blockUser($userInfo, otherUserInfo['username'], $webAppIP); $blockedUsers = $blockedUsers.concat(otherUserInfo['username']); dispatch('message', { path: '/profile' })} } >Block user</button>
 					{:else}
-						<button on:click|preventDefault={ async () => { await unblockUser($userInfo, otherUserInfo['username']); $blockedUsers.splice($blockedUsers.indexOf(otherUserInfo['username']), 1); dispatch('message', { path: '/profile' })} } >Unblock user</button>
+						<button on:click|preventDefault={ async () => { await unblockUser($userInfo, otherUserInfo['username'], $webAppIP); $blockedUsers.splice($blockedUsers.indexOf(otherUserInfo['username']), 1); dispatch('message', { path: '/profile' })} } >Unblock user</button>
 					{/if}
 				</div>
 

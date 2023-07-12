@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cd /usr/frontend
 npm install
 status=7
 while [ $status == 7 ];

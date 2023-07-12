@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userInfo, socket, roomSelected } from "../../data";
+	import { userInfo, socket, roomSelected, webAppIP } from "../../data";
 	import { createEventDispatcher } from "svelte";
     import { retrieveOtherUserInfo, retrieveOtherUserInfoByName } from "./interactionUtils.svelte";
 
@@ -63,7 +63,7 @@
 	async function	inviteFriend(): Promise<void> {
 		const	user: string = document.getElementById('invite-friend').value;
 		console.log(document.getElementById('invite-friend'));
-		const	friend: Object = await retrieveOtherUserInfoByName(user);
+		const	friend: Object = await retrieveOtherUserInfoByName(user, $webAppIP);
 		console.log(user);
 		if (!friend)
 		{

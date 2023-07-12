@@ -12,13 +12,13 @@
 		return date;
 	}
 
-	export async function	loginWithPassword(username: string, password: string): Promise<Response> {
+	export async function	loginWithPassword(username: string, password: string, ip:string): Promise<Response> {
 		const	map: Map<string, string> = new Map([
 			['username', username],
 			['password', password]
 		]);
 		const	json: Object = Object.fromEntries(map);
-		const	response: Response = await fetch('http://localhost:3000/auth/login', {
+		const	response: Response = await fetch(`http://${ip}:3000/auth/login`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
@@ -28,12 +28,10 @@
 		return response;
 	}
 
-	export async function	receiveBearer(userInfo: Object): Promise<boolean> {
+	export async function	receiveBearer(userInfo: Object, ip: string): Promise<boolean> {
 		const	username: string = document.getElementById('username').value;
 		if (username !== userInfo['username'])
 		{
-			console.log(username)
-			console.log(userInfo['username'])
 			if (document.getElementById('error') === null)
 			{
 				const	err: HTMLElement = document.createElement("p");
@@ -47,7 +45,7 @@
 		}
 		const	password: string = document.getElementById('password').value;
 
-		const	res: Response =  await loginWithPassword(username, password);
+		const	res: Response =  await loginWithPassword(username, password, ip);
 		if (res.status !== 200 && res.status !== 204 && res.status !== 201) {
 			if (document.getElementById('error') === null)
 			{

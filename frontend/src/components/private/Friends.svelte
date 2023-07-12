@@ -3,13 +3,13 @@
 	import Notifications from "../utils/Notifications.svelte";
 	import { searchUser } from "../chat/interactionUtils.svelte";
     import UserManagement from "../utils/UserManagement.svelte";
-	import { statusChange, userInfo } from "../../data";
+	import { statusChange, userInfo, webAppIP } from "../../data";
 	
 	let			searchedUser: Object | null;
 	let			searched: boolean = false;
 
 	async function  updateUser(): Promise<void> {
-        const   response: Response = await fetch('http://localhost:3000/users/' + $userInfo['username'] + '-token');
+        const   response: Response = await fetch(`http://${$webAppIP}:3000/users/` + $userInfo['username'] + '-token');
         const   json: Object = await response.json();
         $userInfo = json;
     }
@@ -17,12 +17,12 @@
 	async function	getFriends(): Promise<Array<Object>> {
 		await updateUser();
 		const	response: Response = await fetch(
-			'http://localhost:3000/users/' + $userInfo['username'] + '-token/friends'
+			`http://${$webAppIP}:3000/users/` + $userInfo['username'] + '-token/friends'
 		);
 		const	json: Object = await response.json();
 		let		ret: Array<Object> = [];
 		for (let i = 0; i < Object.keys(json).length; i++) {
-			const	res: Response = await fetch('http://localhost:3000/users/' + json[i] + '-token');
+			const	res: Response = await fetch(`http://${$webAppIP}:3000/users/` + json[i] + '-token');
 			const	elem: Object = await res.json();
 			ret.push(elem);
 		}
@@ -31,7 +31,7 @@
 
 	async function	getUsers(): Promise<Array<Object>> {
 		await updateUser();
-		const	res: Response = await fetch('http://localhost:3000/users');
+		const	res: Response = await fetch(`http://${$webAppIP}:3000/users`);
 		const	json: Object = await res.json();
 		const	ret: Array<Object> = [];
 
@@ -41,7 +41,7 @@
 	}
 
 	async function	searchUserAndDisplay(username: string): Promise<void> {
-		searchedUser = await searchUser(username);
+		searchedUser = await searchUser(username, $webAppIP);
 		searched = true;
 	}
 

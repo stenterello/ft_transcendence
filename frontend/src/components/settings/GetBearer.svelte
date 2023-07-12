@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userInfo, bearer } from "../../data";
+	import { userInfo, bearer, webAppIP } from "../../data";
 	import { createEventDispatcher } from "svelte";
 	import { loginWithPassword } from "../auth/authenticationUtils.svelte";
 
@@ -24,7 +24,7 @@
 		}
 		const	password: string = document.getElementById('password').value;
 
-		const	res: Response =  await loginWithPassword(username, password);
+		const	res: Response =  await loginWithPassword(username, password, $webAppIP);
 		if (res.status !== 200 && res.status !== 204 && res.status !== 201) {
 			if (document.getElementById('error') === null)
 			{

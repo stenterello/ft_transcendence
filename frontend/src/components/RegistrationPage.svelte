@@ -17,7 +17,7 @@
 			['expires', addDays(date, cookieDays).toISOString()]
 		]);
 		const json: Object = Object.fromEntries(map);
-		const response: Response = await fetch('http://localhost:3000/users/create', {
+		const response: Response = await fetch(`http://${$webAppIP}:3000/users/create`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',

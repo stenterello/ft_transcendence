@@ -52,7 +52,7 @@ export class AuthController {
         console.log(data);
         const access_token = data['access_token'];
         this.userService.auth42(access_token);
-        res.redirect('http://localhost:5173/profile')
+        res.redirect(`http://${process.env.WEBAPPIP}:5173/profile`)
     }
 
 	@UseGuards(LocalAuthGuard)

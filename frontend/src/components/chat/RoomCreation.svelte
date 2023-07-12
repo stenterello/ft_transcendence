@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
-	import { userInfo } from "../../data";
+	import { userInfo, webAppIP } from "../../data";
 
 	const	dispatch = createEventDispatcher();
 
@@ -28,7 +28,7 @@
 
 		const	json: Object = { user: $userInfo['username'], password: password, policy: policy};
 
-		const	response: Response = await fetch('http://localhost:3000/chat/create/' + roomName, {
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/chat/create/` + roomName, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json'

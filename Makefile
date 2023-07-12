@@ -1,6 +1,7 @@
 NAME = ft_trascendence
 
 all:
+	bash ./ip.sh
 	docker-compose -f docker-compose.yml up --build
 
 stop:

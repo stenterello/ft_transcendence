@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	import { userInfo, statusChange, socket } from "../../data";
+	import { userInfo, statusChange, socket, webAppIP } from "../../data";
 	import { createEventDispatcher, onMount } from "svelte";
 	import { getStatus } from "./interactionUtils.svelte";
     import ChatSettings from "./ChatSettings.svelte";
@@ -13,7 +13,7 @@
 	let			messages: Array<Object> = [];
 
 	async function	getPrivateMessages(): Promise<void> {
-		const	res: Response = await fetch('http://localhost:3000/chat/' + $userInfo['username'] + '/' + user);
+		const	res: Response = await fetch(`http://${$webAppIP}:3000/chat/` + $userInfo['username'] + '/' + user);
 		const	json: Object = await res.json();
 		messages = Object.values(json);
 	}
@@ -45,7 +45,7 @@
 	<div id="header">
 		<button on:click={() => { dispatch('unselect', null); } }><img src="left-arrow.png" alt="go back" /></button>
 		{#key $statusChange}
-			{#await getStatus(user)}
+			{#await getStatus(user, $webAppIP)}
 				<h2>{user}</h2>
 			{:then status}
 				<h2>{user} <span>{status}</span></h2>

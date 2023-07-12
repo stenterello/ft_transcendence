@@ -5,7 +5,7 @@
 	import ProfilePage from "./private/ProfilePage.svelte";
 	import Notifications from "./utils/Notifications.svelte";
     import NavBar from "./utils/NavBar.svelte";
-	import { userInfo, page_shown } from '../data';
+	import { userInfo, page_shown, webAppIP } from '../data';
 	import VisitProfile from "./private/VisitProfile.svelte";
 	import Friends from "./private/Friends.svelte";
     import InvitationWindow from "./private/InvitationWindow.svelte";
@@ -34,7 +34,7 @@
 	}
 
 	async function	getUserSearched(): Promise<Object> {
-		const	ret: Object = await retrieveOtherUserInfoByName(window.location.search.split('=')[1]);
+		const	ret: Object = await retrieveOtherUserInfoByName(window.location.search.split('=')[1], $webAppIP);
 		return ret;
 	}
 

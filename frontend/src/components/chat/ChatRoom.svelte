@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { statusChange, socket, roomSelected } from "../../data";
+    import { statusChange, socket, roomSelected, webAppIP } from "../../data";
     import OnlineUsers from "./OnlineUsers.svelte";
     import RoomManagementBar from "./RoomManagementBar.svelte";
     import RoomManagement from "./RoomManagement.svelte";
@@ -14,7 +14,7 @@
     let         roomInfo: Object = undefined;
 
     async function  getMessages(): Promise<void> {
-        const   res: Response = await fetch('http://localhost:3000/chat/' + $roomSelected);
+        const   res: Response = await fetch(`http://${$webAppIP}:3000/chat/` + $roomSelected);
         const   json: Array<Object> = await res.json();
         console.log(json);
         for (let i = 0; i < json.length; i++) {
@@ -24,7 +24,7 @@
 
     async function  getRoomObject(): Promise<void> {
         await mock();
-        const   res: Response = await fetch('http://localhost:3000/chat/rooms');
+        const   res: Response = await fetch(`http://${$webAppIP}:3000/chat/rooms`);
         const   json: Object = await res.json();
         for (let i = 0; i < Object.values(json).length; i++) {
             if (json[i]['name'] === $roomSelected)

@@ -1,10 +1,11 @@
 <script lang="ts">
     import UserIcon from "./UserIcon.svelte";
+    import { webAppIP } from "../../data";
 
     export let  userInfo: Object;
 
     async function  getLastFiveMatches(): Promise<Array<Object>> | null {
-        const   response: Response = await fetch('http://localhost:3000/game/official/' + userInfo['username']);
+        const   response: Response = await fetch(`http://${$webAppIP}:3000/game/official/` + userInfo['username']);
         const   json: Object = await response.json();
 
         const   ret: Array<Object> = [];

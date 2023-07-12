@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import { createEventDispatcher } from "svelte";
-    import { socket, userInfo } from "../../data";
+    import { socket, userInfo, webAppIP } from "../../data";
 
     export let  username: string = undefined;
     export let  expandable: boolean = false;
@@ -10,7 +10,7 @@
     const   dispatch = createEventDispatcher();
 
     async function	retrieveOtherUserInfo(username: string): Promise<Object | null> {
-		const	response: Response = await fetch('http://localhost:3000/users/' + username + '-token');
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/` + username + '-token');
 
 		try {
 			const	json: Object = await response.json();

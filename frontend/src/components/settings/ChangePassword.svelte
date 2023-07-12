@@ -2,7 +2,7 @@
 
 	import { createEventDispatcher } from "svelte";
 	import { receiveBearer } from "../auth/authenticationUtils.svelte";
-	import { userInfo, bearer } from "../../data";
+	import { userInfo, bearer, webAppIP } from "../../data";
 
 	const dispatch = createEventDispatcher();
 
@@ -53,7 +53,7 @@
 
 		const	obj: Object = { 'username': $userInfo['username'], 'password': password, 'oldPassword': oldPassword };
 
-		const	response: Response = await fetch('http://localhost:3000/users/update/pwd', {
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/update/pwd`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
@@ -107,7 +107,7 @@
 				<form>
 					<input id="username" type="text" name="username" placeholder="Enter username" required>
 					<input id="password" type="password" name="password" placeholder="Enter password" required>
-					<input on:click|preventDefault={async () => { hasBearer = await receiveBearer($userInfo) } } type="submit">
+					<input on:click|preventDefault={async () => { hasBearer = await receiveBearer($userInfo, $webAppIP) } } type="submit">
 				</form>
 			</div>
 		{:else}

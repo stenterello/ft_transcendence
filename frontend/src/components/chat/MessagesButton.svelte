@@ -1,7 +1,7 @@
 <script lang="ts">
 
 	import { createEventDispatcher } from "svelte";
-	import { statusChange, newMessage, userSelected, userInfo } from "../../data";
+	import { statusChange, newMessage, userSelected, userInfo, webAppIP } from "../../data";
 	import { getStatus, getLastMessage } from "./interactionUtils.svelte";
 
 	export let	user: Object = undefined;
@@ -12,7 +12,7 @@
 	<div class="info">
 		<p>{user['username']}</p>
 		{#key $statusChange}
-			{#await getStatus(user['username'])}
+			{#await getStatus(user['username'], $webAppIP)}
 				<span style="color: rgba(255,255,255,0);">online</span>
 			{:then status}
 				<span>{status}</span>
@@ -20,7 +20,7 @@
 		{/key}
 	</div>
 	{#key $newMessage}
-		{#await getLastMessage($userInfo, user['username'])}
+		{#await getLastMessage($userInfo, user['username'], $webAppIP)}
 			<div class="message">
 				<p id="truncate"></p>
 			</div>

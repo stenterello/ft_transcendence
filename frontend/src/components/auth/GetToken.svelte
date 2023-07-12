@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { socket } from "../../data";
+    import { webAppIP } from "../../data";
     import GetInfo from "./GetInfo.svelte";
 
 
@@ -9,6 +9,8 @@
 	const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
 	const client_secret: string = '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';
 	const redirect_uri: string = 'http://localhost:3000/auth/code';
+	//Fort testing
+	// const redirect_uri: string = `http://${$webAppIP}:3000/auth/code`;
 
 	function craftPayload(code: string): string {
 		const keys: string[] = [ 'grant_type', 'client_id', 'client_secret' ];
@@ -29,28 +31,20 @@
 		return (ret);
 	}
 
-	async function getToken() {
-		// const res = await fetch('https://api.intra.42.fr/oauth/token', {
-		// 	// mode: 'no-cors',
-		// 	method: 'POST',
-		// 	headers: new Headers(
-		// 		{'Access-Control-Allow-Origin': '*', 'content-type': 'application/x-www-form-urlencoded'},
-		// 	),
-		// 	body: craftPayload(code)
-		// })
-		const res = await fetch('http://localhost:3000/auth/access_token', {
-			method: 'GET',
+	async function getToken(code: string): Promise<string> {
+		const res = await fetch('https://api.intra.42.fr/oauth/token', {
+			method: 'POST',
+			headers: new Headers({'content-type': 'application/x-www-form-urlencoded'}),
+			body: craftPayload(code)
 		})
-		
-		console.log('res ' + res);
+
 		const json: Object = await res.json();
-		// console.log('json ' + json);
-		return (json.toString());
+		return (json['access_token']);
 	}
 
 </script>
 
-{#await getToken()}
+{#await getToken(code)}
 	<p>Yoopie! I'm searching your beautiful token!</p>
 {:then token}
 	<GetInfo {token} on:message />

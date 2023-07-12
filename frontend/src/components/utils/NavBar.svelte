@@ -29,7 +29,7 @@
 			$roomSelected = undefined;
 			$opponent = undefined;
 			$pos = undefined;
-			$webAppIP = 'localhost:5173';
+			$webAppIP = 'localhost';
 			$chatTab = 0;
 			dispatch('logout', { path: "/" });
 		}

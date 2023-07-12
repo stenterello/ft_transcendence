@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	import { userInfo, socket, roomSelected } from "../../data";
+	import { userInfo, socket, roomSelected, webAppIP } from "../../data";
 	import ChatRoom from "./ChatRoom.svelte";
     import RoomCreation from "./RoomCreation.svelte";
 
@@ -13,7 +13,7 @@
 	let			room: string = undefined;
 
 	async function	getRooms(): Promise<void> {
-		const	res: Response = await fetch('http://localhost:3000/chat/rooms');
+		const	res: Response = await fetch(`http://${$webAppIP}:3000/chat/rooms`);
 		let		ret: Array<Object> = [];
 		if (res.ok)
 		{

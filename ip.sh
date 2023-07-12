@@ -28,4 +28,12 @@ do
 done
 
 IFS=$old_ifs
+if [ $(uname -s) == "Darwin" ];
+then
+	sed -i '' "s/WEBAPPIP=localhost/WEBAPPIP=$ip/" .env
+	sed -i '' "s/localhost/$ip/" backend/prisma/schema.prisma
+else
+	sed -i "s/WEBAPPIP=localhost/WEBAPPIP=$ip/" .env
+	sed -i "s/localhost/$ip/" backend/prisma/schema.prisma
+fi
 echo $ip;

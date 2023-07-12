@@ -2,7 +2,7 @@
 
 	import { createEventDispatcher } from "svelte";
 	import { setCookie } from 'svelte-cookie';
-	import { userInfo } from "../../data";
+	import { userInfo, webAppIP } from "../../data";
 
 	const	dispatch = createEventDispatcher();
 
@@ -25,7 +25,7 @@
 		else
 		{
 			const	toSend = { 'username': $userInfo['username'], 'email': $userInfo['email'], 'twoFactorAuthenticationCode': token };
-			const	response: Response = await fetch('http://localhost:3000/auth/2fa/authenticate', {
+			const	response: Response = await fetch(`http://${$webAppIP}:3000/auth/2fa/authenticate`, {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json',

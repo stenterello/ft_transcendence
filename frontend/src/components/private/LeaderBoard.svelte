@@ -1,12 +1,12 @@
 <script lang="ts">
 
 	import { createEventDispatcher } from "svelte";
-    import { userInfo } from "../../data";
+    import { userInfo, webAppIP } from "../../data";
 
 	const	dispatch = createEventDispatcher();
 
 	async function	getUsers(): Promise<Array<Object>> {
-		const	response: Response = await fetch('http://localhost:3000/users');
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users`);
 		const	ret: Object = await response.json();
 		return Object.values(ret);
 	}

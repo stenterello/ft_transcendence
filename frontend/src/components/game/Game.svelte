@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { socket, userInfo, opponent, pos } from "../../data";
+    import { socket, userInfo, opponent, pos, webAppIP } from "../../data";
     import CombatLogo from "./CombatLogo.svelte";
     import { createEventDispatcher } from "svelte";
     import { retrieveOtherUserInfoByName } from "../chat/interactionUtils.svelte";
@@ -70,7 +70,7 @@
 
 </script>
 
-{#await retrieveOtherUserInfoByName($opponent)}
+{#await retrieveOtherUserInfoByName($opponent, $webAppIP)}
     <p>loading</p>
 {:then opponentObj} 
     {#if isSpectator === false}

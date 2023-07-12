@@ -15,13 +15,13 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     if (kills === undefined) {
         killedMap.set(user.username, json);
     }
-    if (kills!["Vernita Green slain"] === false && opponent.pictureLink === "http://localhost:3000/uploads/images/vernita_green.png") {
+    if (kills!["Vernita Green slain"] === false && opponent.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/vernita_green.png`) {
         kills!["Vernita Green slain"] = true;
     }
-    if (kills!["O-Ren Ishii killed"] === false && opponent.pictureLink === "http://localhost:3000/uploads/images/o-ren.png") {
+    if (kills!["O-Ren Ishii killed"] === false && opponent.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/o-ren.png`) {
         kills!["O-Ren Ishii killed"] = true;
     }
-    if (kills!["Elle obliterated"] === false && opponent.pictureLink === "http://localhost:3000/uploads/images/elle_driver.png") {
+    if (kills!["Elle obliterated"] === false && opponent.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/elle_driver.png`) {
         kills!["Elle obliterated"] = true;
     }
     let arr: any = await user.achievement;
@@ -35,7 +35,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             })
         }
     }
-    if (user.pictureLink === "http://localhost:3000/uploads/images/bill.png" && arr['kill bill'] === false) {
+    if (user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/bill.png" && arr['kill bill'] === fals`) {
         arr!['kill bill'] = true;
         console.log(arr);
         await prisma.user.update({
@@ -91,7 +91,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             data: { achievement: arr!},
         })
     }
-    if (arr["Elle Driver's fan"] === false && opponent.pictureLink === "http://localhost:3000/uploads/images/paimei.png") {
+    if (arr["Elle Driver's fan"] === false && opponent.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/paimei.png`) {
         arr!["Elle Driver's fan"] = true;
         console.log(arr);
         await prisma.user.update({
@@ -99,7 +99,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             data: { achievement: arr!},
         })
     }
-    if (arr["Master of swords"] === false && user.pictureLink === "http://localhost:3000/uploads/images/hattori_hanzo.png") {
+    if (arr["Master of swords"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/hattori_hanzo.png`) {
         arr!["Master of swords"] = true;
         console.log(arr);
         await prisma.user.update({
@@ -107,7 +107,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             data: { achievement: arr!},
         })
     }
-    if (arr["Yakuza leader"] === false && user.pictureLink === "http://localhost:3000/uploads/images/o-ren.png") {
+    if (arr["Yakuza leader"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/o-ren.png`) {
         arr!["Yakuza leader"] = true;
         console.log(arr);
         await prisma.user.update({
@@ -115,7 +115,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             data: { achievement: arr!},
         })
     }
-    if (arr["The only man I ever loved"] === false && user.pictureLink === "http://localhost:3000/uploads/images/budd.png") {
+    if (arr["The only man I ever loved"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/budd.png`) {
         arr!["The only man I ever loved"] = true;
         console.log(arr);
         await prisma.user.update({
@@ -123,7 +123,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             data: { achievement: arr!},
         })
     }
-    if (arr["Eagle's Claw Style"] === false && user.pictureLink === "http://localhost:3000/uploads/images/paimei.png") {
+    if (arr["Eagle's Claw Style"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/paimei.png`) {
         arr!["Eagle's Claw Style"] = true;
         console.log(arr);
         await prisma.user.update({

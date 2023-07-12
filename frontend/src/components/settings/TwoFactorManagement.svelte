@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
-	import { userInfo, bearer } from "../../data";
+	import { userInfo, bearer, webAppIP } from "../../data";
 	import GetBearer from "./GetBearer.svelte";
 
 	const	dispatch = createEventDispatcher();
@@ -8,7 +8,7 @@
 	async function  toggle2FAuth(): Promise<void> {
 		const  obj: Object = { 'username': $userInfo['username'], 'email': $userInfo['email'] };
 
-		const  response: Response = await fetch('http://localhost:3000/auth/2fa/generate', {
+		const  response: Response = await fetch(`http://${$webAppIP}:3000/auth/2fa/generate`, {
 		method: 'POST',
 		headers: {
 			'content-type': 'application/json',
@@ -47,7 +47,7 @@
 
 		const	obj: Object = { 'username': $userInfo['username'], 'twoFactorAuthenticationCode': token };
 
-		const	response: Response = await fetch('http://localhost:3000/auth/2fa/toggle', {
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/auth/2fa/toggle`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',

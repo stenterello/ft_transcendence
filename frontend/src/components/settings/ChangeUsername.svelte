@@ -2,7 +2,7 @@
 
 	import { createEventDispatcher } from 'svelte';
 	import { deleteCookie, setCookie } from 'svelte-cookie';
-	import { userInfo, bearer } from '../../data';
+	import { userInfo, bearer, webAppIP } from '../../data';
     import GetBearer from './GetBearer.svelte';
 
 	const	dispatch = createEventDispatcher();
@@ -12,7 +12,7 @@
 		body['oldUsername'] = $userInfo['username'];
 		body['username'] = document.getElementById('new-username').value;
 
-		const	res: Response = await fetch('http://localhost:3000/users/update/name', {
+		const	res: Response = await fetch(`http://${$webAppIP}:3000/users/update/name`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',

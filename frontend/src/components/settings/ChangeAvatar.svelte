@@ -2,7 +2,7 @@
 
     import Carousel from "../utils/Carousel.svelte";
 	import { createEventDispatcher } from 'svelte';
-	import { userInfo, bearer } from "../../data";
+	import { userInfo, bearer, webAppIP } from "../../data";
     import GetBearer from "./GetBearer.svelte";
 
 
@@ -37,8 +37,8 @@
 			case 0: {
 				const body: Object = new Object();
 				body['username'] = $userInfo['username'];
-				body['pictureLink'] = ('http://localhost:3000/uploads/' + killBillImages[index]);
-				await fetch('http://localhost:3000/users/update/avatar', {
+				body['pictureLink'] = (`http://${$webAppIP}:3000/uploads/` + killBillImages[index]);
+				await fetch(`http://${$webAppIP}:3000/users/update/avatar`, {
 					method: 'POST',
 					headers: {
 						'content-type': 'application/json',
@@ -50,8 +50,8 @@
 			case 1: {
 				const body: Object = new Object();
 				body['username'] = $userInfo['username'];
-				body['pictureLink'] = ('http://localhost:3000/uploads/' + dvasImages[index]);
-				await fetch('http://localhost:3000/users/update/avatar', {
+				body['pictureLink'] = (`http://${$webAppIP}:3000/uploads/` + dvasImages[index]);
+				await fetch(`http://${$webAppIP}:3000/users/update/avatar`, {
 					method: 'POST',
 					headers: {
 						'content-type': 'application/json',
@@ -64,15 +64,15 @@
 				const	files = document.getElementById('upload-image').files;
 				const	formData = new FormData();
 				formData.append('image', files[0]);
-				const file_path = await fetch('http://localhost:3000/users/upload', {
+				const file_path = await fetch(`http://${$webAppIP}:3000/users/upload`, {
 					method: 'POST',
 					body: formData
 				})
 				const json = await file_path.json();
 				const body: Object = new Object();
 				body['username'] = $userInfo['username'];
-				body['pictureLink'] = ('http://localhost:3000/' + json['result']);		
-				await fetch('http://localhost:3000/users/update/avatar', {
+				body['pictureLink'] = (`http://${$webAppIP}:3000/` + json['result']);		
+				await fetch(`http://${$webAppIP}:3000/users/update/avatar`, {
 					method: 'POST',
 					headers: {
 						'content-type': 'application/json',

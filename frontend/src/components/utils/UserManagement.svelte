@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import { createEventDispatcher } from "svelte/internal";
-    import { socket, blockedUsers, userInfo, statusChange } from "../../data";
+    import { socket, blockedUsers, userInfo, statusChange, webAppIP } from "../../data";
     import { blockUser, unblockUser } from "../chat/interactionUtils.svelte";
 
     export let  user: Object = undefined;
@@ -54,9 +54,9 @@
         {/key}
 
         {#if $userInfo['blocklist'].includes(user['username'])}
-            <button on:click={async () => { await unblockUser($userInfo, user['username']); $blockedUsers.splice($blockedUsers.indexOf(user['username']), 1); dispatch('change', null) } }>Unblock user</button>
+            <button on:click={async () => { await unblockUser($userInfo, user['username'], $webAppIP); $blockedUsers.splice($blockedUsers.indexOf(user['username']), 1); dispatch('change', null) } }>Unblock user</button>
         {:else}
-            <button on:click={async () => { await blockUser($userInfo, user['username']); $blockedUsers = $blockedUsers.concat(user['username']); dispatch('change', null) } }>Block user</button>
+            <button on:click={async () => { await blockUser($userInfo, user['username'], $webAppIP); $blockedUsers = $blockedUsers.concat(user['username']); dispatch('change', null) } }>Block user</button>
         {/if}
     </div>
 </li>

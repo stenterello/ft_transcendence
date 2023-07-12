@@ -3,7 +3,7 @@
 	import { loginWithPassword } from "./authenticationUtils.svelte";
 	import { createEventDispatcher } from "svelte";
 	import { setCookie } from 'svelte-cookie';
-    import GetToken from "./GetToken.svelte";
+	import { webAppIP } from "../../data";
 
 	const appUID: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
 
@@ -15,11 +15,11 @@
 		const cookie: string = username + '-token';
 		const cookieDays: number = 7;
 
-		const response: Response = await loginWithPassword(username, password);
+		const response: Response = await loginWithPassword(username, password, $webAppIP);
 		if (response.ok) {
 			const	json: Object = await response.json();
 			const	bearer: string = json['access_token'];
-			const	tmpResponse: Response = await fetch('http://localhost:3000/users/' + cookie);
+			const	tmpResponse: Response = await fetch(`http://${$webAppIP}:3000/users/` + cookie);
 			const	tmpJson: Object = await tmpResponse.json();
 			if (tmpJson.hasOwnProperty('istwofaEnable') && tmpJson['istwofaEnable'] === true)
 			{
@@ -44,21 +44,14 @@
 		dispatch('message', { path: event.target.getAttribute("href") });
 	}
 
-	async function login_oaut() {
-		await fetch("https://api.intra.42.fr/oauth/authorize?client_id={appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code", {
-			method: 'GET',
-			mode: 'no-cors',
-		})
-	}
-
 </script>
 
 <section>
 	
-	<div>
-		<form id="login_oaut">
-		<button on:click|preventDefault={login_oaut}> Login with 42 intra profile</button>
-		</form>
+	<div style="margin-bottom: 35px;">
+		<a href="https://api.intra.42.fr/oauth/authorize?client_id={appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code">
+			Login to ft_transcendence with 42intra
+		</a>
 	</div>
 
 	<div>

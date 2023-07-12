@@ -54,7 +54,7 @@
 		$roomSelected = undefined;
 		$opponent = undefined;
 		$pos = undefined;
-		$webAppIP = 'localhost:5173';
+		$webAppIP = 'localhost';
 		$chatTab = 0;
 		stopWatching();
 		dispatch('logout', { path: "/" });
@@ -100,7 +100,7 @@
 			resetHome();
 			return (null);
 		}
-		const	response: Response = await fetch('http://localhost:3000/users/' + cookie);
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/` + cookie);
 		if (response.body === null)
 		{
 			resetHome();
@@ -117,7 +117,7 @@
 
 	async function	searchFriend(): Promise<void> {
 		const	username: string = document.getElementById('friend-input').value;
-		const	response: Response = await fetch('http://localhost:3000/users/' + username + '-token');
+		const	response: Response = await fetch(`http://${$webAppIP}:3000/users/` + username + '-token');
 
 		try {
 			friend = await response.json();
