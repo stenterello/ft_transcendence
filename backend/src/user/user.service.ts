@@ -10,6 +10,8 @@ import {
   UpdateEmailDto,  
 } from "./user.dto";
 import { comparePassword, encodePassword } from "src/utils/bcrypt";
+import { HttpService } from '@nestjs/axios';
+import { catchError, first, firstValueFrom, lastValueFrom, map } from 'rxjs';
 
 const json = {
   "Kill bill": false,
@@ -26,10 +28,23 @@ const json = {
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly httpService: HttpService,
+    ) {}
 
-  async auth42(auth42Dto: Auth42Dto) {
-    auth42Dto.achievement = json;
+  async auth42(access_token: string) {
+    const { data } = await firstValueFrom(this.httpService
+      .get('https://api.intra.42.fr/v2/me', { headers: {'Authorization': 'Bearer ' + access_token}}));
+    const auth42Dto: Auth42Dto = {
+      username: data['login'],
+      email: data['email'],
+      pictureLink: data['image']['link'],
+      cookie: data['login'] + '-token',
+      expires: new Date(Date.now() + 900000),
+      isOAuthLogged: true,
+      achievement: json
+    };
     try {
       await this.prisma.user.create({ data: auth42Dto });
     } catch {

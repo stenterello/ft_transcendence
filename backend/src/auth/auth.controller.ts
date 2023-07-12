@@ -8,9 +8,11 @@ import {
 	Res,
 	UnauthorizedException,
 	UseGuards,
+    UsePipes,
     Head,
     Header,
     HttpStatus,
+    ValidationPipe,
 	} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -19,16 +21,13 @@ import { UserService } from '../user/user.service';
 import { Jwt2faAuthGuard } from 'src/jwt/jwt-2fa-auth.guard';
 import { Param } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom, lastValueFrom, map } from 'rxjs';
-import axios, { AxiosResponse } from 'axios';
-import { Redirect } from '@nestjs/common';
-import { HttpException } from '@nestjs/common';
+import { catchError, first, firstValueFrom, lastValueFrom, map } from 'rxjs';
 
 const grant_type: string = 'authorization_code';
 const appUID: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
 const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
 const client_secret: string = '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';
-const redirect_uri: string = 'https://www.google.com';
+const redirect_uri: string = 'http://localhost:3000/auth/code';
 
 @Controller('auth')
 export class AuthController {
@@ -41,16 +40,19 @@ export class AuthController {
     @Get('code')
     async getCode(@Res() res: any, @Req() req: Request) {
         const url = req.url;
-        console.log(url);
+        const headers: any = req.headers;
+        let referer: string = headers['referer'];
+        const ref = referer.substring(0, referer.length - 1);
+        console.log(referer);
         const url_split = url.split("=");
         const code = url_split[1];
-        res.redirect(`http://localhost:5173?code=${code}`);
-    }
-
-    @Get('access_token')
-    async getBearer(@Req() req: Request, @Body() body: any, code: string) {
-        console.log("access_token");
-        console.log(body);
+        const body = `grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&code=${code}&redirect_uri=${redirect_uri}`
+        const { data } = await firstValueFrom(this.httpService
+            .post(`https://api.intra.42.fr/oauth/token`, body, { headers: {'content-type': 'application/x-www-form-urlencoded'}}));
+        console.log(data);
+        const access_token = data['access_token'];
+        this.userService.auth42(access_token);
+        res.redirect('http://localhost:5173/profile')
     }
 
 	@UseGuards(LocalAuthGuard)

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { socket } from "../../data";
     import GetInfo from "./GetInfo.svelte";
 
 
@@ -28,20 +29,28 @@
 		return (ret);
 	}
 
-	async function getToken(code: string): Promise<string> {
-		const res = await fetch('https://api.intra.42.fr/oauth/token', {
-			method: 'POST',
-			headers: new Headers({'content-type': 'application/x-www-form-urlencoded'}),
-			body: craftPayload(code)
+	async function getToken() {
+		// const res = await fetch('https://api.intra.42.fr/oauth/token', {
+		// 	// mode: 'no-cors',
+		// 	method: 'POST',
+		// 	headers: new Headers(
+		// 		{'Access-Control-Allow-Origin': '*', 'content-type': 'application/x-www-form-urlencoded'},
+		// 	),
+		// 	body: craftPayload(code)
+		// })
+		const res = await fetch('http://localhost:3000/auth/access_token', {
+			method: 'GET',
 		})
-
+		
+		console.log('res ' + res);
 		const json: Object = await res.json();
-		return (json['access_token']);
+		// console.log('json ' + json);
+		return (json.toString());
 	}
 
 </script>
 
-{#await getToken(code)}
+{#await getToken()}
 	<p>Yoopie! I'm searching your beautiful token!</p>
 {:then token}
 	<GetInfo {token} on:message />

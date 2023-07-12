@@ -46,14 +46,14 @@ export class UserController {
         return await this.UserService.delAll();
     }
 
-    @Post('auth')
-    auth42Login(@Body() auth42Dto: Auth42Dto, @Res({ passthrough: true }) response: Response) {
-        const tmpCookie = auth42Dto.username + '-token';
-        auth42Dto.cookie = tmpCookie;
-        auth42Dto.expires = new Date(Date.now() + 900000);
-        auth42Dto.isOAuthLogged = true;
-        return this.UserService.auth42(auth42Dto);
-    }
+    // @Post('auth')
+    // auth42Login(@Body() auth42Dto: Auth42Dto, @Res({ passthrough: true }) response: Response) {
+    //     const tmpCookie = auth42Dto.username + '-token';
+    //     auth42Dto.cookie = tmpCookie;
+    //     auth42Dto.expires = new Date(Date.now() + 900000);
+    //     auth42Dto.isOAuthLogged = true;
+    //     return this.UserService.auth42(auth42Dto);
+    // }
 
     @Post('create')
     createUser(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) response: Response, @Req() request: Request, client: Socket) {

@@ -5,8 +5,9 @@
 	export let token: string | undefined;
 
 	async function	getInfo(): Promise<string> | null{
-		if (token === undefined)
+		if (token === undefined || token == null)
 			return null;
+			console.log(token);
 		const res = await fetch('https://api.intra.42.fr/v2/me', {
 			method: 'GET',
 			headers: new Headers({'Authorization': 'Bearer ' + token}),
