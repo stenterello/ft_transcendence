@@ -10,6 +10,7 @@ import {
 	UseGuards,
     Head,
     Header,
+    HttpStatus,
 	} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -21,6 +22,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom, lastValueFrom, map } from 'rxjs';
 import axios, { AxiosResponse } from 'axios';
 import { Redirect } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 
 const grant_type: string = 'authorization_code';
 const appUID: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
@@ -36,33 +38,17 @@ export class AuthController {
         private readonly httpService: HttpService,
 	) {}
 
-    @Get()
-    @Redirect(`https://api.intra.42.fr/oauth/authorize?client_id=${appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code`)
-    async sendAuth() {
-        // console.log(this.httpService.get("https://api.intra.42.fr/oauth/authorize?client_id=${appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code"))
-    }
-
     @Get('code')
     async getCode(@Res() res: any, @Req() req: Request) {
         const url = req.url;
+        console.log(url);
         const url_split = url.split("=");
         const code = url_split[1];
-        console.log(code);
-        const body: string = `grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&code=${code}&redirect_uri=${redirect_uri}`;
-        res.header('content-type', 'application/x-www-form-urlencoded');
-        res.header('method', 'POST');
-        res.url = 'https://api.intra.42.fr/oauth/token';
-        res.body = body;
-        console.log(res);
-        // this.httpService.post(
-        //     'https://api.intra.42.fr/oauth/token',
-        //     { body: body.toString},
-        //     { headers: { 'content-type': 'application/x-www-form-urlencoded' }}
-        //     );
-        }
+        res.redirect(`http://localhost:5173?code=${code}`);
+    }
 
     @Get('access_token')
-    async getBearer(@Req() req: Request, @Body() body: any) {
+    async getBearer(@Req() req: Request, @Body() body: any, code: string) {
         console.log("access_token");
         console.log(body);
     }

@@ -10,6 +10,7 @@
 
 	function	defineState(): authenticationState {
 		const	params: Object = getParams(location.href);
+		console.log(params);
 		const	nParams: number = Object.keys(params).length;
 
 		if (nParams === 0)

@@ -15,7 +15,6 @@
 		const cookieDays: number = 7;
 
 		const response: Response = await loginWithPassword(username, password);
-		console.log("login");
 		if (response.ok) {
 			const	json: Object = await response.json();
 			const	bearer: string = json['access_token'];
