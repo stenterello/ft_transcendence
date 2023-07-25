@@ -8,11 +8,6 @@ import {
 	Res,
 	UnauthorizedException,
 	UseGuards,
-    UsePipes,
-    Head,
-    Header,
-    HttpStatus,
-    ValidationPipe,
 	} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -22,6 +17,7 @@ import { Jwt2faAuthGuard } from 'src/jwt/jwt-2fa-auth.guard';
 import { Param } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, first, firstValueFrom, lastValueFrom, map } from 'rxjs';
+import { User } from "@prisma/client";
 
 const grant_type: string = 'authorization_code';
 const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
@@ -46,7 +42,7 @@ export class AuthController {
         const { data } = await firstValueFrom(this.httpService
             .post(`https://api.intra.42.fr/oauth/token`, body, { headers: {'content-type': 'application/x-www-form-urlencoded'}}));
         const access_token = data['access_token'];
-        const user: any = await this.userService.auth42(access_token);
+        const user: User = await this.userService.auth42(access_token);
         const cookie = user.username + "-token";
         console.log(cookie);
         res.redirect(`http://${process.env.WEBAPPIP}:5173/redirect?code=${cookie}`);

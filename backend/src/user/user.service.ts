@@ -11,7 +11,7 @@ import {
 } from "./user.dto";
 import { comparePassword, encodePassword } from "src/utils/bcrypt";
 import { HttpService } from '@nestjs/axios';
-import { catchError, first, firstValueFrom, lastValueFrom, map } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 const json = {
   "Kill bill": false,
@@ -45,8 +45,8 @@ export class UserService {
       isOAuthLogged: true,
       achievement: json
     };
-    let user: any;
-    user = this.prisma.user.findUnique({
+    let user: User | null;
+    user = await this.prisma.user.findUnique({
       where: { username: data['login']}
     });
     if (user == null) {
