@@ -180,7 +180,7 @@
 			{#if $page_shown === "/" || $page_shown.startsWith("/?")}
 				<MainPage on:message={show_page} />
 			{:else if $page_shown.startsWith("/redirect")}
-        			<Redirect on:message={show_page} />
+        		<Redirect on:message={show_page} />
 			{:else if $page_shown === "/register"}
 				<RegistrationPage on:message={show_page} />
 			{:else if isInPrivateSpace($page_shown)}
