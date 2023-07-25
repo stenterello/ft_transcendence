@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { webAppIP, userInfo, page_shown, chat, bearer, socket, events, onlineUsers, inGameUsers, statusChange, generalMessages, newMessage, waitingGame } from "./data";
+    import Redirect from './components/auth/Redirect.svelte';
     import MainPage from "./components/MainPage.svelte";
     import Logged from "./components/Logged.svelte";
     import RegistrationPage from "./components/RegistrationPage.svelte";
@@ -178,6 +179,8 @@
 		{:then}
 			{#if $page_shown === "/" || $page_shown.startsWith("/?")}
 				<MainPage on:message={show_page} />
+			{:else if $page_shown.startsWith("/redirect")}
+        			<Redirect on:message={show_page} />
 			{:else if $page_shown === "/register"}
 				<RegistrationPage on:message={show_page} />
 			{:else if isInPrivateSpace($page_shown)}

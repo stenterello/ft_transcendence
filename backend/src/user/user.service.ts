@@ -36,7 +36,7 @@ export class UserService {
   async auth42(access_token: string) {
     const { data } = await firstValueFrom(this.httpService
       .get('https://api.intra.42.fr/v2/me', { headers: {'Authorization': 'Bearer ' + access_token}}));
-    const auth42Dto: Auth42Dto = {
+      const auth42Dto: Auth42Dto = {
       username: data['login'],
       email: data['email'],
       pictureLink: data['image']['link'],
@@ -45,11 +45,14 @@ export class UserService {
       isOAuthLogged: true,
       achievement: json
     };
-    try {
-      await this.prisma.user.create({ data: auth42Dto });
-    } catch {
-          throw new BadRequestException();
-      }
+    let user: any;
+    user = this.prisma.user.findUnique({
+      where: { username: data['login']}
+    });
+    if (user == null) {
+      user = await this.prisma.user.create({ data: auth42Dto });
+    }
+    return user;
   }
 
   async create(createUserDto: CreateUserDto) {

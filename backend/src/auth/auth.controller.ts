@@ -24,9 +24,8 @@ import { HttpService } from '@nestjs/axios';
 import { catchError, first, firstValueFrom, lastValueFrom, map } from 'rxjs';
 
 const grant_type: string = 'authorization_code';
-const appUID: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
 const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
-const client_secret: string = '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';
+const client_secret: string = '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';
 const redirect_uri: string = 'http://localhost:3000/auth/code';
 
 @Controller('auth')
@@ -41,18 +40,16 @@ export class AuthController {
     async getCode(@Res() res: any, @Req() req: Request) {
         const url = req.url;
         const headers: any = req.headers;
-        let referer: string = headers['referer'];
-        const ref = referer.substring(0, referer.length - 1);
-        console.log(referer);
         const url_split = url.split("=");
         const code = url_split[1];
         const body = `grant_type=${grant_type}&client_id=${client_id}&client_secret=${client_secret}&code=${code}&redirect_uri=${redirect_uri}`
         const { data } = await firstValueFrom(this.httpService
             .post(`https://api.intra.42.fr/oauth/token`, body, { headers: {'content-type': 'application/x-www-form-urlencoded'}}));
-        console.log(data);
         const access_token = data['access_token'];
-        this.userService.auth42(access_token);
-        res.redirect(`http://${process.env.WEBAPPIP}:5173/profile`)
+        const user: any = await this.userService.auth42(access_token);
+        const cookie = user.username + "-token";
+        console.log(cookie);
+        res.redirect(`http://${process.env.WEBAPPIP}:5173/redirect?code=${cookie}`);
     }
 
 	@UseGuards(LocalAuthGuard)
