@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import { createEventDispatcher } from "svelte";
-    import { socket, userInfo, webAppIP } from "../../data";
+    import { opponent, socket, userInfo, webAppIP } from "../../data";
 
     export let  username: string = undefined;
     export let  expandable: boolean = false;
@@ -76,7 +76,7 @@
                     button[i].style.fontSize = '0.6em';
                     text = document.createTextNode('Invite to play');
                     button[i].appendChild(text);
-                    break ;
+                    button[i].addEventListener('click', () => { $opponent = user['username']; $socket.emit('invite to private game', JSON.stringify({ user: user['username']})); dispatch('message', { path: '/waitingUser'})});
                 }
                 default: break ;
             }

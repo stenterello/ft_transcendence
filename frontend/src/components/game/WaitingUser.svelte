@@ -6,6 +6,7 @@
 
 	let	answerChange: boolean = true;
 	$waitingGame = true;
+	let	rememberOpponent: string = $opponent;
 
 	$socket.on('gameReady', (data) => {
 		$opponent = data['opponent'];
@@ -31,7 +32,7 @@
 		</div>
 	{:else}
 		<div>
-			<h4>{$opponent} dismissed your challenge request :(</h4>
+			<h4>{rememberOpponent} dismissed your challenge request :(</h4>
 		</div>
 	{/if}
 {/key}

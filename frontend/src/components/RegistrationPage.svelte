@@ -27,7 +27,7 @@
 		return (response);
 	}
 
-	async function	register(event): Promise<void> {
+	async function	register(): Promise<void> {
 		const username: string = document.getElementById('username').value;
 		const email: string = document.getElementById('email').value;
 		const password: string = document.getElementById('password').value;

@@ -114,6 +114,13 @@
 		$socket.on('event', (event) => {
 			$events = $events.concat(event['data']['events'][0]);
 		});
+		$socket.on('events', (event, string) => {
+			let	data: Object = {
+				type: event,
+				sender: string
+			}
+			$events = $events.concat(data);
+		});
 		$socket.on('forbidden', () => {
 			$socket.disconnect();
 			$userInfo = undefined;
@@ -162,7 +169,6 @@
 			path === "/game" ||
 			path === "/friends" ||
 			path === "/invitationWindow" ||
-			path === "/waitingUser" ||
 			path === "/leaderboard" ||
 			path.startsWith('/achievements') ||
 			path.startsWith("/profile"))

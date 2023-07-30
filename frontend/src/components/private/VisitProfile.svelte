@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { inGameUsers, onlineUsers, socket, userInfo, blockedUsers, webAppIP } from "../../data";
+    import { inGameUsers, onlineUsers, socket, userInfo, blockedUsers, webAppIP, opponent } from "../../data";
 	import { blockUser, unblockUser, retrieveOtherUserInfo } from "../chat/interactionUtils.svelte";
     import Stats from "../utils/Stats.svelte";
     import MatchHistory from "../utils/MatchHistory.svelte";
@@ -51,7 +51,7 @@
 						<button on:click={async () => { await removeFriend(otherUserInfo['username']); changed = (changed) ? false : true}}>Remove friend</button>
 					{/if}
 					{#if otherUserInfo['friends'].includes($userInfo['username']) && $inGameUsers.includes(otherUserInfo['username']) === false && $onlineUsers.includes(otherUserInfo['username'])}
-						<button>Invite to play</button>
+						<button on:click={() => { $opponent = otherUserInfo['username']; $socket.emit('invite to private game', JSON.stringify({ user: otherUserInfo['username']})); dispatch('message', { path: "/waitingUser" }) }}>Invite to play</button>
 					{/if}
 					{#if $userInfo['blocklist'].includes(otherUserInfo['username']) === false}
 						<button on:click|preventDefault={ async () => { await blockUser($userInfo, otherUserInfo['username'], $webAppIP); $blockedUsers = $blockedUsers.concat(otherUserInfo['username']); dispatch('message', { path: '/profile' })} } >Block user</button>

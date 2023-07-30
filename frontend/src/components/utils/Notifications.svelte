@@ -49,6 +49,13 @@
 		changed++;
 	}
 
+	function	dismissGameRequest(event: Object): void {
+		const	index: number = $events.indexOf(event);
+		if (index !== -1)
+			$events.splice(index, 1);
+		changed++;
+	}
+
 	async function	acceptInviteToRoom(event: Object) {
 		$socket.emit('joinRoom', {user: $userInfo['username'], room: event['room']});
 		const	index: number = $events.indexOf(event);
@@ -94,6 +101,13 @@
 									<p>invited you to a new room.</p>
 									<button on:click={() => acceptInviteToRoom(event)}>accept</button>
 									<button on:click={() => dismiss(event)}>dismiss</button>
+								</li>
+							{:else if event['type'] === "PRIVATEGAME"}
+								<li>
+									<UserIcon username={event['sender']} --flex-direction="column" on:message />
+									<p>invited you to play.</p>
+									<button on:click={() => acceptInviteToRoom(event)}>accept</button>
+									<button on:click={() => { $socket.emit('deny private game', JSON.stringify({user: event['sender']})); dismissGameRequest(event) }}>dismiss</button>
 								</li>
 							{/if}
 						{/each}

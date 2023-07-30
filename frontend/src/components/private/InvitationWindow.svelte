@@ -5,6 +5,8 @@
 
 	const	dispatch = createEventDispatcher();
 
+	// export let	user: string = undefined;
+
 	async function  updateUser(): Promise<void> {
         const   response: Response = await fetch(`http://${$webAppIP}:3000/users/` + $userInfo['username'] + '-token');
         const   json: Object = await response.json();

@@ -199,6 +199,14 @@ import {
         }
     }
 
+    @SubscribeMessage("deny private game")
+    async privateDeny(client: Socket, data: any) {
+        const json = JSON.parse(data);
+        const p1: User | null = await this.userService.findByName(json['user'])!;
+        if (p1 && p1.socketId)
+            this.server.to(p1.socketId).emit('gameDismissed')
+    }
+
     @SubscribeMessage("accept private game")
     async privateAccept(client: Socket, data: any) {
         const json = JSON.parse(data);
