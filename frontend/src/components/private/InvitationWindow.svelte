@@ -5,8 +5,6 @@
 
 	const	dispatch = createEventDispatcher();
 
-	// export let	user: string = undefined;
-
 	async function  updateUser(): Promise<void> {
         const   response: Response = await fetch(`http://${$webAppIP}:3000/users/` + $userInfo['username'] + '-token');
         const   json: Object = await response.json();
@@ -60,11 +58,16 @@
 			return ;
 		}
 		$opponent = info['user'];
-		$socket.emit('customGame', JSON.stringify(info));
+		const	gameInfo: Object = {
+			map: info['map'],
+			points: info['points']
+		};
+		info['gameInfo'] = gameInfo;
+		$socket.emit('invite to private game', JSON.stringify(info));
 		dispatch('message', { path: "/waitingUser" });
 	}
 
-	onMount(() => { if ($opponent !== undefined) { document.getElementById('opponent').value = $opponent; } });
+	onMount(() => { if ($opponent !== undefined) { setTimeout(() => {document.getElementById('opponent').value = $opponent;}, 100); } });
 
 </script>
 

@@ -114,10 +114,11 @@
 		$socket.on('event', (event) => {
 			$events = $events.concat(event['data']['events'][0]);
 		});
-		$socket.on('events', (event, string) => {
+		$socket.on('events', (event, string, info) => {
 			let	data: Object = {
 				type: event,
-				sender: string
+				sender: string,
+				info: info
 			}
 			$events = $events.concat(data);
 		});

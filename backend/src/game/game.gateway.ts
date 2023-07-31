@@ -194,8 +194,9 @@ import {
         const json = JSON.parse(data);
         const p1 = await this.userService.findBySocket(client.id);
         const p2 = await this.userService.findByName(json['user']);
+        const info = json['gameInfo'];
         if (p1 && p2 && p1.status != 'offline' && p2.status != 'offline') {
-            this.server.to(p2.socketId).emit("events", "PRIVATEGAME", p1!.username);
+            this.server.to(p2.socketId).emit("events", "PRIVATEGAME", p1!.username, info);
         }
     }
 
@@ -213,11 +214,11 @@ import {
         const p2: User | null = await this.userService.findBySocket(client.id)!;
         const p1: User | null = await this.userService.findByName(json['user'])!;
         if (json['bool'] === true && p1 && p2) {
-            this.startGame(p1, p2);
+            this.startGame(p1, p2, json['map'], json['points']);
         }
     }
 
-    async startGame(p1: User, p2: User) {
+    async startGame(p1: User, p2: User, map: string, points: string) {
         this.game.push(new Game(this.server, this.prisma, p1, p2, this.matchId++));
         await this.game[this.matchId].loopGame("unofficial");
     }

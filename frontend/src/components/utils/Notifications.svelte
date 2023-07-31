@@ -3,6 +3,7 @@
 	import { socket, userInfo, webAppIP, events } from "../../data";
 	import { createEventDispatcher } from 'svelte';
     import UserIcon from "./UserIcon.svelte";
+    import Game from "../game/Game.svelte";
 	
 	let			changed: number = 0;
 	let			isOpen: boolean = false;
@@ -57,7 +58,7 @@
 	}
 
 	async function	acceptInviteToRoom(event: Object) {
-		$socket.emit('joinRoom', {user: $userInfo['username'], room: event['room']});
+		$socket.emit('accept private game', JSON.stringify({user: $userInfo['username'], bool: true, map: event['info']['map'], points: event['info']['points']}));
 		const	index: number = $events.indexOf(event);
 		if (index !== -1)
 			$events.splice(index, 1);

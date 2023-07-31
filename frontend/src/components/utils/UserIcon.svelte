@@ -76,7 +76,7 @@
                     button[i].style.fontSize = '0.6em';
                     text = document.createTextNode('Invite to play');
                     button[i].appendChild(text);
-                    button[i].addEventListener('click', () => { $opponent = user['username']; $socket.emit('invite to private game', JSON.stringify({ user: user['username']})); dispatch('message', { path: '/waitingUser'})});
+                    button[i].addEventListener('click', () => { $opponent = user['username']; dispatch('message', { path: '/invitationWindow'})});
                 }
                 default: break ;
             }
