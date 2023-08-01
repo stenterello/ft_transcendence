@@ -222,7 +222,7 @@ import {
         this.game.push(new Game(this.server, this.prisma, p1, p2, this.matchId++, Number(speed), Number(size), Number(points)));
         this.server.to(p1.socketId!).emit('gameReady', { opponent: p1.username, pos: "left", map: currentMap});
         this.server.to(p2.socketId!).emit('gameReady', { opponent: p2.username, pos: "right", map: currentMap});
-        await this.game[this.matchId].loopGame("unofficial");
+        await this.game[this.matchId - 1].loopGame("unofficial");
     }
 
     @SubscribeMessage('leftGame')

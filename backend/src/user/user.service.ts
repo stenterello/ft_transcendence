@@ -59,6 +59,7 @@ export class UserService {
     const password = encodePassword(createUserDto.password);
     createUserDto.password = password;
     createUserDto.achievement = json;
+    createUserDto.pictureLink = `http://${process.env.WEBAPPIP}:3000/uploads/default-avatar.png`;
     try {
       return await this.prisma.user.create({ data: createUserDto });
     }

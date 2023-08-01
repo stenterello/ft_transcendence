@@ -32,7 +32,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   public async handleConnection(client: any, ...args: any[]) {
-    const username = client.handshake.headers['username'];
+    const username = await client.handshake.headers['username'];
     const sockId = client.id;
     const user: User | null = await this.prisma.user.findUnique({
       where: { username: username }

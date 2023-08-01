@@ -1,6 +1,5 @@
 import { User, Prisma, Matches } from "@prisma/client";
 import { PrismaService } from "prisma/prisma.service";
-import { kill } from "process";
 
 let json: {[key: string]: boolean } = {
     "Vernita Green slain": false,
@@ -14,6 +13,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     let kills = killedMap.get(user.username);
     if (kills === undefined) {
         killedMap.set(user.username, json);
+        kills = killedMap.get(user.username);
     }
     if (kills!["Vernita Green slain"] === false && opponent.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/vernita_green.png`) {
         kills!["Vernita Green slain"] = true;
@@ -35,7 +35,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             })
         }
     }
-    if (user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/bill.png" && arr['kill bill'] === fals`) {
+    if (user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/bill.png" && arr['kill bill']` === false) {
         arr!['kill bill'] = true;
         console.log(arr);
         await prisma.user.update({

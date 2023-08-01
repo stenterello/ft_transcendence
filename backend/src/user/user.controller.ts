@@ -27,7 +27,6 @@ import { Socket } from "socket.io";
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from "src/utils/imageutils";
 import { AuthService } from "src/auth/auth.service";
-import { JwtAuthGuard } from "src/jwt/jwt-auth.guard";
 
 @Controller('users')
 export class UserController {
@@ -46,17 +45,8 @@ export class UserController {
         return await this.UserService.delAll();
     }
 
-    // @Post('auth')
-    // auth42Login(@Body() auth42Dto: Auth42Dto, @Res({ passthrough: true }) response: Response) {
-    //     const tmpCookie = auth42Dto.username + '-token';
-    //     auth42Dto.cookie = tmpCookie;
-    //     auth42Dto.expires = new Date(Date.now() + 900000);
-    //     auth42Dto.isOAuthLogged = true;
-    //     return this.UserService.auth42(auth42Dto);
-    // }
-
     @Post('create')
-    createUser(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) response: Response, @Req() request: Request, client: Socket) {
+    createUser(@Body() createUserDto: CreateUserDto) {
         return this.UserService.create(createUserDto);
     }
 

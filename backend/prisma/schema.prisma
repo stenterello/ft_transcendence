@@ -20,7 +20,7 @@ model User {
   email         String    @unique
   status        String    @default("offline")
   score         Int       @default(0)
-  pictureLink   String?   @default("http://localhost:3000/uploads/default-avatar.png")
+  pictureLink   String?
   victories     Int       @default(0)
   loses         Int       @default(0)
   matches       Int       @default(0)

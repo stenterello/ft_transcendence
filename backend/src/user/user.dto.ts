@@ -48,6 +48,9 @@ export class CreateUserDto {
     expires: Date;
 
     achievement: any;
+
+    @IsString()
+    pictureLink: string;
 }
 
 export class UpdateEmailDto {
