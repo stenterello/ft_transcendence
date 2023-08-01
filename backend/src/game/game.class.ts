@@ -10,10 +10,10 @@ export class Game {
     private ballCordY: number = 50;
     private ballDirX: number;
     private ballDirY: number;
-    private speed: number = 1;
+    private speed: number;
     private LPY: number = 35;
     private RPY: number = 35;
-    private size: number = 30;
+    private size: number;
     private canvasWidth: number = 100;
     private canvasHeight: number = 100;
     private P1: number = 0;
@@ -25,16 +25,20 @@ export class Game {
     private interval: any;
     private matchId: number;
     private timer: number = 0;
-    private wallSpeed: number = 3;
+    private wallSpeed: number;
     private spectators: Array<string> = [];
     private isPaused: boolean = false;
+    private maxPoints: number;
     
     constructor(
         private server: Server,
         private prisma: PrismaService,
         player1: User,
         player2: User,
-        id: number
+        id: number,
+        speed: number,
+        size: number,
+        max: number,
         ) {
             this.user1 = player1;
             this.user2 = player2;
@@ -42,6 +46,10 @@ export class Game {
             this.P1Sock = this.user1.socketId!;
             this.P2Sock = this.user2.socketId!;
             this.matchId = id;
+            this.speed = speed;
+            this.size = size;
+            this.wallSpeed = this.speed * 5 - (this.size / 30);
+            this.maxPoints = max;
             this.resetGame();
     }
 
@@ -108,27 +116,30 @@ export class Game {
         Math.floor(Math.random() * 10) % 2 === 0 ? this.ballDirY = 1 : this.ballDirY = -1;
         this.LPY = 35;
         this.RPY = 35;
-        this.speed = 2;
-        this.wallSpeed = 2;
+        this.wallSpeed = this.speed * 5 - (this.size / 30);
         this.timer = 0;
     }
 
     public async loopGame(type: string) {
+        let speed: number = this.speed;
         return new Promise (async (resolve) => {
             this.interval = setInterval(async () => {
                 if (this.isPaused === false) {
                     if (this.timer % 80 == 0) {
-                        this.speed += 1;
+                        speed += 1;
+                        this.wallSpeed = speed * 5 - (this.size / 30);
                     }
                     this.timer++;
-                    this.ballCordX += (this.ballDirX * this.speed);
-                    this.ballCordY += (this.ballDirY * this.speed);
+                    this.ballCordX += (this.ballDirX * speed);
+                    this.ballCordY += (this.ballDirY * speed);
                     this.update();
                     if (this.ballCordX <= 0) {
                         this.P2++;
+                        speed = this.speed;
                         await this.resetGame();
                     } else if (this.ballCordX >= this.canvasWidth) {
                         this.P1++;
+                        speed = this.speed;
                         await this.resetGame();
                     } else if (this.ballCordY <= 1 || this.ballCordY >= this.canvasHeight - 1) {
                         this.ballDirY *= -1;
@@ -139,9 +150,9 @@ export class Game {
                             this.ballCordY <= this.RPY + this.size && this.ballCordY >= this.RPY)) {
                         this.ballDirX *= -1;
                     }
-                    if (this.P1 === 5 || this.P2 === 5) {
+                    if (this.P1 === this.maxPoints || this.P2 === this.maxPoints) {
                         this.endGame(type);
-                        return this.P1 === 5 ? resolve("Player 1 won") : resolve("Player 2 won");
+                        return this.P1 === this.maxPoints ? resolve("Player 1 won") : resolve("Player 2 won");
                     }
                 }
             }, 100);

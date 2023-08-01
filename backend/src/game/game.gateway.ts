@@ -115,7 +115,7 @@ import {
         if (match) {
             this.matchId = match.id;
         }
-        this.game = new Game(this.server, this.prisma, this.p1, this.p2, this.matchId);
+        this.game = new Game(this.server, this.prisma, this.p1, this.p2, this.matchId, 1, 30, 5);
         await this.game.loopGame("official").then(() => {
             this.bool = false;
             this.P1Sock = "";
@@ -214,12 +214,14 @@ import {
         const p2: User | null = await this.userService.findBySocket(client.id)!;
         const p1: User | null = await this.userService.findByName(json['user'])!;
         if (json['bool'] === true && p1 && p2) {
-            this.startGame(p1, p2, json['map'], json['points']);
+            this.startGame(p1, p2, json['map'],json['points'], json['speed'], json['size']);
         }
     }
 
-    async startGame(p1: User, p2: User, map: string, points: string) {
-        this.game.push(new Game(this.server, this.prisma, p1, p2, this.matchId++));
+    async startGame(p1: User, p2: User, currentMap: string, points: string, speed: string, size: string) {
+        this.game.push(new Game(this.server, this.prisma, p1, p2, this.matchId++, Number(speed), Number(size), Number(points)));
+        this.server.to(p1.socketId!).emit('gameReady', { opponent: p1.username, pos: "left", map: currentMap});
+        this.server.to(p2.socketId!).emit('gameReady', { opponent: p2.username, pos: "right", map: currentMap});
         await this.game[this.matchId].loopGame("unofficial");
     }
 
@@ -229,7 +231,6 @@ import {
             if (this.game[i].getP1Sock() === client.id || this.game[i].getP2Sock() === client.id)
             this.game[i].remPlayer(client.id);
             this.matchId = -1;
-
         }
     }
 
