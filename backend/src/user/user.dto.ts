@@ -49,7 +49,6 @@ export class CreateUserDto {
 
     achievement: any;
 
-    @IsString()
     pictureLink: string;
 }
 

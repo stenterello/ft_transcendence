@@ -21,7 +21,7 @@ CREATE TABLE "user"."User" (
     "email" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'offline',
     "score" INTEGER NOT NULL DEFAULT 0,
-    "pictureLink" TEXT DEFAULT 'http://localhost:3000/uploads/default-avatar.png',
+    "pictureLink" TEXT,
     "victories" INTEGER NOT NULL DEFAULT 0,
     "loses" INTEGER NOT NULL DEFAULT 0,
     "matches" INTEGER NOT NULL DEFAULT 0,

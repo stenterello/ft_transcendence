@@ -207,30 +207,25 @@ export class Game {
             if (this.P1 === 5) {
                 await this.prisma.user.update({
                     where: { socketId: this.P1Sock },
-                    data: { victories: { increment: 1},
-                            matches: { increment: 1 }},
+                    data: { victories: { increment: 1},},
                 })
                 await this.prisma.user.update({
                     where: { socketId: this.P2Sock },
-                    data: { loses: { increment: 1},
-                            matches: { increment: 1 }},
+                    data: { loses: { increment: 1},},
                 })
                 checkAchievement(this.user1!, this.user2!, this.prisma, this.P1 + "-" + this.P2);
             } else if (this.P2 === 5) {
                 await this.prisma.user.update({
                     where: { socketId: this.P2Sock },
-                    data: { victories: { increment: 1},
-                            matches: { increment: 1 }},
+                    data: { victories: { increment: 1},},
                 })
                 await this.prisma.user.update({
                     where: { socketId: this.P1Sock },
-                    data: { loses: { increment: 1},
-                            matches: { increment: 1 }},
+                    data: { loses: { increment: 1},},
                 })
                 checkAchievement(this.user2!, this.user1!, this.prisma, this.P1 + "-" + this.P2);
             }
         }
-
     }
 
     public async addSpect(client: string) {

@@ -10,6 +10,4 @@ done
 
 sleep 3
 
-# >&2 npx prisma migrate reset --force
->&2 npx prisma migrate dev
 /bin/sh "$@"
