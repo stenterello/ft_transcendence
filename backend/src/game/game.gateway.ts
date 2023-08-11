@@ -211,6 +211,7 @@ import {
     @SubscribeMessage("accept private game")
     async privateAccept(client: Socket, data: any) {
         const json = JSON.parse(data);
+        console.log(json);
         const p2: User | null = await this.userService.findBySocket(client.id)!;
         const p1: User | null = await this.userService.findByName(json['user'])!;
         if (json['bool'] === true && p1 && p2) {
@@ -219,7 +220,8 @@ import {
     }
 
     async startGame(p1: User, p2: User, currentMap: string, points: string, speed: string, size: string) {
-        this.game.push(new Game(this.server, this.prisma, p1, p2, this.matchId++, Number(speed), Number(size), Number(points)));
+        console.log(speed + " " + size);
+        this.game.push(new Game(this.server, this.prisma, p1, p2, this.matchId++, speed === undefined ? 1 : Number(speed), size === undefined ? 30 : Number(size), Number(points)));
         this.server.to(p1.socketId!).emit('privateGameReady', { opponent: p1.username, pos: "left", map: currentMap});
         this.server.to(p2.socketId!).emit('privateGameReady', { opponent: p2.username, pos: "right", map: currentMap});
         await this.game[this.matchId - 1].loopGame("unofficial");
@@ -245,8 +247,9 @@ import {
     @SubscribeMessage('privateDown')
     async down(client: Socket) {
         for (let i = 0; i <= this.matchId; i++) {
-            if (this.game[i].getP1Sock() === client.id || this.game[i].getP2Sock() === client.id)
-            this.game[i].moveDown(client.id);
+            if (this.game[i] && this.game[i].getP1Sock() === client.id || this.game[i].getP2Sock() === client.id) {
+                this.game[i].moveDown(client.id);
+            }
         }
     }
 

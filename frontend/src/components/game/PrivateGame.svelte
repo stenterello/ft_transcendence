@@ -39,6 +39,8 @@
 
     onMount(() => {
         $socket.on('update', (info: Object) => {
+            console.log("update");
+            console.log(info);
             updateBall(info);
             updateRackets(info);
             updatePoints(info);
@@ -57,10 +59,10 @@
 
     function    moveRacket(event: KeyboardEvent): void {
         if (event.key === 'ArrowUp') {
-            $socket.emit('up');
+            $socket.emit('privateUp');
         }
         else if (event.key === 'ArrowDown') {
-            $socket.emit('down');
+            $socket.emit('privateDown');
         }
     }
 

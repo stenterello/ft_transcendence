@@ -47,7 +47,13 @@ export class Game {
             this.P2Sock = this.user2.socketId!;
             this.matchId = id;
             this.speed = speed;
+            if (this.speed == 0) {
+                this.speed = 1;
+            }
             this.size = size;
+            if (this.size == 0) {
+                this.size = 30;
+            }
             this.wallSpeed = this.speed * 5 - (this.size / 30);
             this.maxPoints = max;
             this.resetGame();
@@ -160,6 +166,7 @@ export class Game {
     }
 
     public update() {
+        console.log(this.ballCordX + " " + this.ballCordY + " " + this.LPY + " " + this.RPY + " " + this.P1 + " " + this.P2);
         this.server.to(this.P1Sock).emit('update', {
             ballX: this.ballCordX,
             ballY: this.ballCordY,
