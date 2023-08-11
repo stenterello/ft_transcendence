@@ -16,7 +16,6 @@
     async function  getMessages(): Promise<void> {
         const   res: Response = await fetch(`http://${$webAppIP}:3000/chat/` + $roomSelected);
         const   json: Array<Object> = await res.json();
-        console.log(json);
         for (let i = 0; i < json.length; i++) {
             messages.push(json[i]);
         }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { socket, waitingGame, opponent, pos, userInfo } from "../../data";
+	import { socket, waitingGame, opponent, pos, userInfo, mapUrl, racketSize } from "../../data";
 	import { createEventDispatcher } from 'svelte';
 
 	const	dispatch = createEventDispatcher();
@@ -13,6 +13,9 @@
 			$opponent = data['opponent'];
 		$pos = data['pos'];
 		$waitingGame = false;
+		$mapUrl = data['map'];
+		$racketSize = data['size'];
+		console.log(data)
 		dispatch('message', { path: "/privateGame" })
 	});
 

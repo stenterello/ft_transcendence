@@ -62,9 +62,7 @@
 
 	async function	inviteFriend(): Promise<void> {
 		const	user: string = document.getElementById('invite-friend').value;
-		console.log(document.getElementById('invite-friend'));
 		const	friend: Object = await retrieveOtherUserInfoByName(user, $webAppIP);
-		console.log(user);
 		if (!friend)
 		{
 			alert("No user with that name!");

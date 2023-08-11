@@ -20,3 +20,5 @@ export let	opponent: Writable<string> = writable(undefined);
 export let	pos: Writable<string> = writable(undefined);
 export let	webAppIP: Writable<string> = writable('localhost');
 export let	chatTab: Writable<number> = writable(0);
+export let  racketSize: Writable<number> = writable(30);
+export let  mapUrl: Writable<string> = writable('unset');

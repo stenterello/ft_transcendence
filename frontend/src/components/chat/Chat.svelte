@@ -31,8 +31,6 @@
 			}
 			case 1: {
 				$socket.emit('sendToRoom', JSON.stringify({'room': $roomSelected, 'message': messages}));
-				console.log( JSON.stringify({'room': $roomSelected, 'message': messages}));
-				console.log('ei')
 				break ;
 			}
 			case 2: {

@@ -28,7 +28,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     if (arr['The Bride'] === false) {
         if (kills!["Vernita Green slain"] && kills!["O-Ren Ishii killed"] && kills!["Elle obliterated"]) {
             arr!['The Bride'] = true;
-            console.log(arr);
             await prisma.user.update({
                 where: { socketId: user.socketId! },
                 data: { achievement: arr! }
@@ -37,7 +36,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/bill.png" && arr['kill bill']` === false) {
         arr!['kill bill'] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},
@@ -45,7 +43,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (user.victories >= 88 && arr['Leader of the Crazy 88s'] === false) {
         arr!['Leader of the Crazy 88s'] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},
@@ -59,7 +56,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
         for (let i = 0; i < match.length; i++) {
             if (match[i]['score'][0] != '5') {
                 arr!["Vernita Green's daughter"] = true;
-                console.log(arr);
+    
                 await prisma.user.update({
                     where: { socketId: user.socketId! },
                     data: { achievement: arr!},
@@ -74,7 +71,7 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             for (let i = 0; i < match2.length; i++) {
                 if (match2[i]['score'][2] != '5') {
                     arr!["Vernita Green's daughter"] = true;
-                    console.log(arr);
+        
                     await prisma.user.update({
                         where: { socketId: user.socketId! },
                         data: { achievement: arr!},
@@ -85,7 +82,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (arr["Five Point Palm Exploding Heart Technique"] === false && score[2] === '0') {
         arr!["Five Point Palm Exploding Heart Technique"] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},
@@ -93,7 +89,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (arr["Elle Driver's fan"] === false && opponent.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/paimei.png`) {
         arr!["Elle Driver's fan"] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},
@@ -101,7 +96,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (arr["Master of swords"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/hattori_hanzo.png`) {
         arr!["Master of swords"] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},
@@ -109,7 +103,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (arr["Yakuza leader"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/o-ren.png`) {
         arr!["Yakuza leader"] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},
@@ -117,7 +110,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (arr["The only man I ever loved"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/budd.png`) {
         arr!["The only man I ever loved"] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},
@@ -125,7 +117,6 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
     }
     if (arr["Eagle's Claw Style"] === false && user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/paimei.png`) {
         arr!["Eagle's Claw Style"] = true;
-        console.log(arr);
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},

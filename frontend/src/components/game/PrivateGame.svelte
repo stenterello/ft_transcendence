@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { socket, userInfo, opponent, pos, webAppIP } from "../../data";
+    import { socket, userInfo, opponent, pos, webAppIP, mapUrl, racketSize } from "../../data";
     import CombatLogo from "./CombatLogo.svelte";
     import { createEventDispatcher } from "svelte";
     import { retrieveOtherUserInfoByName } from "../chat/interactionUtils.svelte";
@@ -10,6 +10,15 @@
     export let  isSpectator: boolean = false;
 
     const       dispatch = createEventDispatcher();
+
+    if ($mapUrl !== "unset" && $mapUrl !== "default") {
+        const   imageName: string = $mapUrl;
+        $mapUrl = `url(http://${$webAppIP}:5173/images/maps/` + imageName + ")";
+    }
+    else
+        $mapUrl = "unset";
+
+    $racketSize += '%';
 
     function    updateBall(info: Object): void {
         const   ball: HTMLElement = document.getElementById('ball');
@@ -39,8 +48,6 @@
 
     onMount(() => {
         $socket.on('update', (info: Object) => {
-            console.log("update");
-            console.log(info);
             updateBall(info);
             updateRackets(info);
             updatePoints(info);
@@ -92,9 +99,9 @@
                     <CombatLogo user={$userInfo} left={false} points={point2} />
                 {/key}
             {/if}
-            <section id="game">
-                <div class="racket" id="left"></div>
-                <div class="racket" id="right"></div>
+            <section id="game" style="--map-url: {$mapUrl}">
+                <div class="racket" id="left" style="--racket-size: {$racketSize}"></div>
+                <div class="racket" id="right" style="--racket-size: {$racketSize}"></div>
                 <div id="ball"></div>
             </section>
         </div>
@@ -109,9 +116,9 @@
                     <CombatLogo user={$userInfo} left={false} points={point2} {isSpectator} />
                 {/key}
             </div>
-            <section id="game-spectator">
-                <div class="racket" id="left"></div>
-                <div class="racket" id="right"></div>
+            <section id="game-spectator" style="--map-url: {$mapUrl}">
+                <div class="racket" id="left" style="--racket-size: {$racketSize}"></div>
+                <div class="racket" id="right" style="--racket-size: {$racketSize}"></div>
                 <div id="ball"></div>
             </section>
         </div>
@@ -153,6 +160,8 @@
         height: 85vh;
         width: 70vw;
         border: 1px solid white;
+        background-image: var(--map-url);
+        background-size: cover;
     }
     section#game-spectator {
         overflow: hidden;
@@ -160,10 +169,12 @@
         width: 100%;
         border: 1px solid white;
         position: relative;
+        background-image: var(--map-url);
+        background-size: cover;
     }
     .racket {
         width: 2%;
-        height: 30%;
+        height: var(--racket-size);
         background-color: white;
         position: absolute;
     }

@@ -143,7 +143,6 @@ export class UserService {
       let arr: any = await user.achievement;
       if (arr['change name'] === false) {
         arr!['change name'] = true;
-            console.log(arr);
             await this.prisma.user.update({
                 where: { socketId: user.socketId! },
                 data: { achievement: arr!},

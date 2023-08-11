@@ -60,7 +60,9 @@
 		$opponent = info['user'];
 		const	gameInfo: Object = {
 			map: info['map'],
-			points: info['points']
+			points: info['points'],
+			speed: info['speed'],
+			size: info['size']
 		};
 		info['gameInfo'] = gameInfo;
 		$socket.emit('invite to private game', JSON.stringify(info));
@@ -97,10 +99,26 @@
 					<option value="20">20</option>
 				</select>
 				<br>
+				<label for="racket-size">select racket size</label>
+				<select id="racket-size">
+					<option value="15">small</option>
+					<option value="30">normal</option>
+					<option value="45">large</option>
+				</select>
+				<br>
+				<label for="ball-speed">select ball speed</label>
+				<select id="ball-speed">
+					<option value="0.5">slow</option>
+					<option value="1">normal</option>
+					<option value="1.5">fast</option>
+				</select>
+				<br>
 				<input on:click|preventDefault={() => inviteFriendToPlay({
 					user: document.getElementById('opponent').value,
 					map: document.getElementById('map').value,
-					points: document.getElementById('points').value
+					points: document.getElementById('points').value,
+					speed: document.getElementById('ball-speed').value,
+					size: document.getElementById('racket-size').value
 				})} type="submit" value="Invite friend">
 			</form>
 			<div id="map-preview">

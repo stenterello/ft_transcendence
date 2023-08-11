@@ -66,7 +66,7 @@
 	}
 
 	async function	acceptInviteToPlay(event: Object) {
-		$socket.emit('accept private game', JSON.stringify({user: event['sender'], bool: true, map: event['info']['map'], points: event['info']['points']}));
+		$socket.emit('accept private game', JSON.stringify({user: event['sender'], bool: true, map: event['info']['map'], points: event['info']['points'], speed: event['info']['speed'], size: event['info']['size']}));
 		$opponent = event['sender'];
 		const	index: number = $events.indexOf(event);
 		if (index !== -1)

@@ -9,8 +9,6 @@
 		const	username: string = document.getElementById('username').value;
 		if (username !== $userInfo['username'])
 		{
-			console.log(username)
-			console.log($userInfo['username'])
 			if (document.getElementById('error') === null)
 			{
 				const	err: HTMLElement = document.createElement("p");

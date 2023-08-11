@@ -91,7 +91,6 @@ export class ChatRepository {
                 throw new BadRequestException("user not found");
             }
             arr.splice(index, 1);
-            console.log(arr);
             return await this.prisma.rooms.update({
                 where: { name: room },
                 data: {

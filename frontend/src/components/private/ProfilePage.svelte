@@ -2,7 +2,7 @@
 
 	import { createEventDispatcher } from 'svelte';
 	import { deleteCookie, getCookie } from 'svelte-cookie';
-    import { socket, waitingGame, events, generalMessages, bearer, chat, onlineUsers, inGameUsers, userInfo, userSelected, opponent, pos, blockedUsers, roomSelected, webAppIP, chatTab } from '../../data';
+    import { socket, waitingGame, events, generalMessages, bearer, chat, onlineUsers, inGameUsers, userInfo, userSelected, opponent, pos, blockedUsers, roomSelected, webAppIP, chatTab, mapUrl, racketSize } from '../../data';
 	import Stats from '../utils/Stats.svelte';
     import MatchHistory from '../utils/MatchHistory.svelte';
     import Game from '../game/Game.svelte';
@@ -82,7 +82,7 @@
 	}
 
 	$socket.on('gameReady', () => { stopWatching(); dispatch('message', { path: "/game" }) })
-	$socket.on('privateGameReady', () => { stopWatching(); dispatch('message', { path: "/privateGame" }) })
+	$socket.on('privateGameReady', (data) => { stopWatching(); $mapUrl = data['map']; $racketSize = data['size']; dispatch('message', { path: "/privateGame" }) })
 
 	let	cookie: string;
 
