@@ -166,7 +166,6 @@ export class Game {
     }
 
     public update() {
-        console.log(this.ballCordX + " " + this.ballCordY + " " + this.LPY + " " + this.RPY + " " + this.P1 + " " + this.P2);
         this.server.to(this.P1Sock).emit('update', {
             ballX: this.ballCordX,
             ballY: this.ballCordY,

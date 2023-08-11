@@ -47,9 +47,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       where: { username: username },
       data : { socketId: sockId, status: 'online' }
     })
-    console.log('User connected: ' + client.id);
     this.users.push(username);
-    console.log(...this.users)
     await this.server.in(client.id).socketsJoin('general');
     return this.server.emit("status", { username: username, status: "online" });
   }
@@ -69,7 +67,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       })
       const index = this.users.indexOf(user.username);
       this.users.splice(index, 1);
-      console.log('User disconnected: ', client.id);
       this.server.emit("status", { username: user.username, status: "offline" });
     }
   }
@@ -99,7 +96,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (index !== -1) {
         return ("friend request already sent!");
       }
-      console.log('user ' + user.username + ' sent a friend request to ' + friend.username);
       let data = await this.prisma.user.update({
         where: { username: friend.username },
         data: {
@@ -134,7 +130,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (username) {
       const arr = await this.chatRepository.getFriendReq(username.username);
       if (arr && arr.length > 0) {
-        console.log(arr);
         return arr;
       }
     }
@@ -308,7 +303,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       }
       if (room.password !== null) {
         if (!comparePassword(json['password'], room.password) || !pwd) {
-          console.log("compare");
           return false;
         }
       }
@@ -371,9 +365,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const json = JSON.parse(data);
     const user: User | null = await this.userService.findBySocket(client.id);
     const room: Rooms | null = await this.chatRepository.getRooms(json['room']);
-    console.log('test');
-    console.log(user);
-    console.log(room);
     if (user && room && room.admins.includes(user.username)) {
       const arr = await this.chatRepository.getRoomMembers(room.name);
       if (arr) {
