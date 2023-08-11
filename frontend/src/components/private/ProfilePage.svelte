@@ -82,6 +82,7 @@
 	}
 
 	$socket.on('gameReady', () => { stopWatching(); dispatch('message', { path: "/game" }) })
+	$socket.on('privateGameReady', () => { stopWatching(); dispatch('message', { path: "/privateGame" }) })
 
 	let	cookie: string;
 

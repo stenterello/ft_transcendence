@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { socket, waitingGame, opponent, pos } from "../../data";
+	import { socket, waitingGame, opponent, pos, userInfo } from "../../data";
 	import { createEventDispatcher } from 'svelte';
 
 	const	dispatch = createEventDispatcher();
@@ -8,11 +8,12 @@
 	$waitingGame = true;
 	let	rememberOpponent: string = $opponent;
 
-	$socket.on('gameReady', (data) => {
-		$opponent = data['opponent'];
+	$socket.on('privateGameReady', (data) => {
+		if (data['opponent'] !== $userInfo['username'])
+			$opponent = data['opponent'];
 		$pos = data['pos'];
 		$waitingGame = false;
-		dispatch('message', { path: "/game" })
+		dispatch('message', { path: "/privateGame" })
 	});
 
 	$socket.on('gameDismissed', () => {

@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	import { socket, userInfo, webAppIP, events } from "../../data";
+	import { socket, userInfo, webAppIP, events, opponent } from "../../data";
 	import { createEventDispatcher } from 'svelte';
     import UserIcon from "./UserIcon.svelte";
     import Game from "../game/Game.svelte";
@@ -58,7 +58,16 @@
 	}
 
 	async function	acceptInviteToRoom(event: Object) {
-		$socket.emit('accept private game', JSON.stringify({user: $userInfo['username'], bool: true, map: event['info']['map'], points: event['info']['points']}));
+		$socket.emit('joinRoom', {user: $userInfo['username'], room: event['room']});
+		const	index: number = $events.indexOf(event);
+		if (index !== -1)
+			$events.splice(index, 1);
+		changed++;
+	}
+
+	async function	acceptInviteToPlay(event: Object) {
+		$socket.emit('accept private game', JSON.stringify({user: event['sender'], bool: true, map: event['info']['map'], points: event['info']['points']}));
+		$opponent = event['sender'];
 		const	index: number = $events.indexOf(event);
 		if (index !== -1)
 			$events.splice(index, 1);
@@ -107,7 +116,7 @@
 								<li>
 									<UserIcon username={event['sender']} --flex-direction="column" on:message />
 									<p>invited you to play.</p>
-									<button on:click={() => acceptInviteToRoom(event)}>accept</button>
+									<button on:click={() => acceptInviteToPlay(event)}>accept</button>
 									<button on:click={() => { $socket.emit('deny private game', JSON.stringify({user: event['sender']})); dismissGameRequest(event) }}>dismiss</button>
 								</li>
 							{/if}

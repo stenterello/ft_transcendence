@@ -14,7 +14,8 @@
 	import Game from "./game/Game.svelte";
     import LeaderBoard from "./private/LeaderBoard.svelte";
     import WaitingUser from "./game/WaitingUser.svelte";
-    import { retrieveOtherUserInfo, retrieveOtherUserInfoByName } from "./chat/interactionUtils.svelte";
+    import { retrieveOtherUserInfoByName } from "./chat/interactionUtils.svelte";
+    import PrivateGame from "./game/PrivateGame.svelte";
 
 	function	resetHome(): void {
 		$userInfo = undefined;
@@ -47,6 +48,8 @@
 		<WaitingRoom on:message />
 	{:else if $page_shown === '/game'}
 		<Game on:message />
+	{:else if $page_shown === '/privateGame'}
+		<PrivateGame on:message />
 	{:else}
 		<Notifications />
 		<NavBar on:message on:logout />

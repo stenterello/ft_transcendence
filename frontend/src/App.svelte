@@ -168,6 +168,7 @@
 		if (path === "/waitingRoom" ||
 			path === "/waitingUser" ||
 			path === "/game" ||
+			path === "/privateGame" ||
 			path === "/friends" ||
 			path === "/invitationWindow" ||
 			path === "/leaderboard" ||

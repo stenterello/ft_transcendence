@@ -1,7 +1,7 @@
 <script lang="ts">
 
     import { createEventDispatcher } from "svelte/internal";
-    import { socket, blockedUsers, userInfo, statusChange, webAppIP } from "../../data";
+    import { socket, blockedUsers, userInfo, statusChange, webAppIP, opponent } from "../../data";
     import { blockUser, unblockUser } from "../chat/interactionUtils.svelte";
 
     export let  user: Object = undefined;
@@ -41,7 +41,7 @@
 
         {#key $statusChange}
             {#if $userInfo['friends'].includes(user['username']) && user['status'] === 'online' && $userInfo['blocklist'].includes(user['username']) === false}
-                <button>Invite to play</button>
+                <button on:click={ () => {$opponent = user['username']; dispatch('message', { path: '/invitationWindow'})} }>Invite to play</button>
             {/if}
 
             {#if $userInfo['friends'].includes(user['username'])}
