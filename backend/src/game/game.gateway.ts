@@ -227,7 +227,7 @@ import {
 
     @SubscribeMessage('leftGame')
     async left(client: Socket) {
-        for (let i = 0; i <= this.matchId; i++) {
+        for (let i = 0; i < this.matchId; i++) {
             if (this.game[i].getP1Sock() === client.id || this.game[i].getP2Sock() === client.id)
             this.game[i].remPlayer(client.id);
             this.matchId = -1;
@@ -236,7 +236,7 @@ import {
 
     @SubscribeMessage('privateUp')
     async up(client: Socket) {
-        for (let i = 0; i <= this.matchId; i++) {
+        for (let i = 0; i < this.matchId; i++) {
             if (this.game[i].getP1Sock() === client.id || this.game[i].getP2Sock() === client.id)
             this.game[i].moveUp(client.id);
         }
@@ -244,7 +244,7 @@ import {
 
     @SubscribeMessage('privateDown')
     async down(client: Socket) {
-        for (let i = 0; i <= this.matchId; i++) {
+        for (let i = 0; i < this.matchId; i++) {
             if (this.game[i] && this.game[i].getP1Sock() === client.id || this.game[i].getP2Sock() === client.id) {
                 this.game[i].moveDown(client.id);
             }
@@ -255,7 +255,7 @@ import {
     async liveGameOn(client: Socket, target: string) {
         const user: User | null = await this.userService.findByName(target);
         if (user && user.socketId) {
-            for (let i = 0; i <= this.matchId; i++) {
+            for (let i = 0; i < this.matchId; i++) {
                 if (this.game[i].getP1Sock() === user.socketId || this.game[i].getP2Sock() === user.socketId) {
                     this.game[i].addSpect(client.id);
                 }

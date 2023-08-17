@@ -43,8 +43,8 @@ export class Game {
             this.user1 = player1;
             this.user2 = player2;
             this.server = server;
-            this.P1Sock = this.user1.socketId!;
-            this.P2Sock = this.user2.socketId!;
+            this.P1Sock = player1.socketId!;
+            this.P2Sock = player2.socketId!;
             this.matchId = id;
             this.speed = speed;
             if (this.speed == 0) {
