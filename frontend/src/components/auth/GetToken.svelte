@@ -7,7 +7,7 @@
 
 	const grant_type: string = 'authorization_code';
 	const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
-	const client_secret: string = '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';
+	const client_secret: string = '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';
 	const redirect_uri: string = 'http://localhost:3000/auth/code';
 	//Fort testing
 	// const redirect_uri: string = `http://${$webAppIP}:3000/auth/code`;

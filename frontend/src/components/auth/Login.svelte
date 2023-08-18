@@ -49,7 +49,7 @@
 <section>
 	
 	<div style="margin-bottom: 35px;">
-		<a href="https://api.intra.42.fr/oauth/authorize?client_id={appUID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcode&response_type=code">
+		<a href="https://api.intra.42.fr/oauth/authorize?client_id={appUID}&redirect_uri=http%3A%2F%2F10.12.5.1%3A3000%2Fauth%2Fcode&response_type=code">
 			Login to ft_transcendence with 42intra
 		</a>
 	</div>

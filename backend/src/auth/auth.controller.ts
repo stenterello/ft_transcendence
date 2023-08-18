@@ -21,8 +21,8 @@ import { User } from "@prisma/client";
 
 const grant_type: string = 'authorization_code';
 const client_id: string = 'u-s4t2ud-adc0efe1a0bf91978d89796314b8297930becce3a35c95f623c2059b571c45ad';
-const client_secret: string = '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';
-const redirect_uri: string = 'http://localhost:3000/auth/code';
+const client_secret: string = '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';
+const redirect_uri: string = `http://${process.env.WEBAPPIP}:3000/auth/code`;
 
 @Controller('auth')
 export class AuthController {
