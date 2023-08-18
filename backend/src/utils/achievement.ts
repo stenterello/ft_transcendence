@@ -34,8 +34,8 @@ export async function checkAchievement (user: User, opponent: User, prisma: Pris
             })
         }
     }
-    if (user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/bill.png" && arr['kill bill']` === false) {
-        arr!['kill bill'] = true;
+    if (user.pictureLink === `http://${process.env.WEBAPPIP}:3000/uploads/images/bill.png" && arr['Kill bill']` === false) {
+        arr!['Kill bill'] = true;
         await prisma.user.update({
             where: { socketId: user.socketId! },
             data: { achievement: arr!},

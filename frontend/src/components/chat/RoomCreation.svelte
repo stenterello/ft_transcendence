@@ -65,7 +65,6 @@
 	<select id="room-privacy" on:change={isPassword} >
 		<option value="PUBLIC">public</option>
 		<option value="PROTECTED">protected</option>
-		<option value="PRIVATE">private</option>
 	</select>
 	<br>
 	<br>

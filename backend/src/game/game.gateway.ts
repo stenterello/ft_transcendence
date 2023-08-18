@@ -180,7 +180,7 @@ import {
 
     public async handleDisconnect(client: Socket) {
         if (this.game.length > 0) {
-            for (let x = 0; x <= this.matchId; x++) {
+            for (let x = 0; x < this.matchId; x++) {
                 if (this.game[x].getP1Sock() === client.id || this.game[x].getP2Sock() === client.id) {
                     this.game[x].endGame("unofficial");
                     return ;
